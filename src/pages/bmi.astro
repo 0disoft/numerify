@@ -49,5 +49,58 @@ import Layout from "../layouts/Layout.astro";
 </Layout>
 
 <script>
-  // 이 부분은 다음 단계에서 작성합니다.
+  // DOM 요소들을 가져옵니다.
+  const heightInput = document.getElementById("height") as HTMLInputElement;
+  const weightInput = document.getElementById("weight") as HTMLInputElement;
+  const calculateBtn = document.getElementById("calculate-btn");
+  const resultDiv = document.getElementById("result");
+  const bmiValueSpan = document.getElementById("bmi-value");
+  const bmiStatusP = document.getElementById("bmi-status");
+
+  // 'calculateBtn'이 실제로 존재하는지 확인한 후 이벤트 리스너를 추가합니다.
+  if (calculateBtn) {
+    calculateBtn.addEventListener("click", () => {
+      // heightInput과 weightInput도 null이 아닐 때만 값을 사용합니다.
+      if (!heightInput || !weightInput) return;
+
+      const height = parseFloat(heightInput.value);
+      const weight = parseFloat(weightInput.value);
+
+      // 입력값 유효성 검사
+      if (isNaN(height) || isNaN(weight) || height <= 0 || weight <= 0) {
+        alert("유효한 키와 몸무게를 입력해주세요.");
+        return;
+      }
+
+      // BMI 계산 (키를 cm에서 m로 변환)
+      const heightInMeters = height / 100;
+      const bmi = weight / (heightInMeters * heightInMeters);
+      const bmiFixed = bmi.toFixed(2); // 소수점 둘째 자리까지 표시
+
+      // BMI 상태 결정
+      let status = "";
+      let statusClass = "";
+      if (bmi < 18.5) {
+        status = "저체중";
+        statusClass = "text-blue-600";
+      } else if (bmi < 23) {
+        status = "정상";
+        statusClass = "text-green-600";
+      } else if (bmi < 25) {
+        status = "과체중";
+        statusClass = "text-yellow-600";
+      } else {
+        status = "비만";
+        statusClass = "text-red-600";
+      }
+
+      // 결과 표시 (각 요소가 존재하는지 확인)
+      if (bmiValueSpan) bmiValueSpan.textContent = bmiFixed;
+      if (bmiStatusP) {
+        bmiStatusP.textContent = status;
+        bmiStatusP.className = `mt-2 text-lg font-bold ${statusClass}`;
+      }
+      if (resultDiv) resultDiv.classList.remove("hidden");
+    });
+  }
 </script>
