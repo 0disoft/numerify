@@ -1,4 +1,6 @@
 ---
+import Header from "../components/Header.astro";
+
 // TypeScript를 사용하여 Props 타입을 정의합니다.
 // 모든 페이지에서 페이지 제목(title)을 받을 수 있도록 설정합니다.
 interface Props {
@@ -20,7 +22,10 @@ const { title } = Astro.props;
     <title>{title}</title>
   </head>
   <body>
-    <slot />
+    <Header />
+    <main>
+      <slot />
+    </main>
   </body>
 </html>
 <style is:global>
@@ -40,6 +45,9 @@ const { title } = Astro.props;
     font-family: system-ui, sans-serif;
     background: #f6f6f6;
     background-size: 224px;
+  }
+  body {
+    margin: 0;
   }
   code {
     font-family:

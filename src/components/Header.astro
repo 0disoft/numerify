@@ -1,0 +1,44 @@
+---
+// src/components/Header.astro
+---
+
+<header>
+  <nav>
+    <a href="/" class="logo">Numerify</a>
+    <div class="nav-links">
+      <a href="/bmi">BMI 계산기</a>
+      <a href="/d-day">D-Day 계산기</a>
+    </div>
+  </nav>
+</header>
+
+<style>
+  header {
+    margin: 0;
+    padding: 0 1rem;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 4rem;
+  }
+  .logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: black;
+  }
+  .nav-links a {
+    margin-left: 1rem;
+    text-decoration: none;
+    color: #333;
+  }
+  .nav-links a:hover {
+    color: rgb(var(--accent));
+  }
+</style>
