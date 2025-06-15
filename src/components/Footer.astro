@@ -1,0 +1,16 @@
+---
+// src/components/Footer.astro
+const today = new Date();
+---
+
+<footer>
+  &copy; {today.getFullYear()} Numerify. All rights reserved.
+</footer>
+<style>
+  footer {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
+  }
+</style>
