@@ -1,0 +1,1145 @@
+TITLE: Trigger Deployment with Vercel Deploy Hook
+DESCRIPTION: Trigger a new deployment for a connected Git repository by making an HTTP GET or POST request to a unique URL generated for your Project's Deploy Hook. This method allows initiating deployments without requiring a new commit to the repository.
+SOURCE: https://vercel.com/docs/deployments
+
+LANGUAGE: APIDOC
+CODE:
+```
+HTTP Method: GET or POST
+Endpoint: Unique URL generated for a Project's Deploy Hook
+Purpose: Trigger a new deployment for a connected Git repository without a new commit.
+```
+
+----------------------------------------
+
+TITLE: Generate Text with AI SDK using Different LLM Providers
+DESCRIPTION: The AI SDK provides a unified API for text generation across various LLM providers. These examples demonstrate how to use the `generateText` function with OpenAI's GPT-4o and Anthropic's Claude Sonnet 3.7, showcasing the ease of switching between models by changing only the model import and instantiation.
+SOURCE: https://vercel.com/docs/ai-sdk
+
+LANGUAGE: TypeScript
+CODE:
+```
+import { generateText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+ 
+const { text } = await generateText({
+  model: openai('gpt-4o'),
+  prompt: 'Explain the concept of quantum entanglement.',
+});
+```
+
+LANGUAGE: TypeScript
+CODE:
+```
+import { generateText } from 'ai';
+import { anthropic } from '@ai-sdk/anthropic';
+ 
+const { text } = await generateText({
+  model: anthropic('claude-3-7-sonnet-20250219'),
+  prompt: 'How many people will live in the world in 2040?',
+});
+```
+
+----------------------------------------
+
+TITLE: Define a Vercel Function with Web Handler
+DESCRIPTION: This snippet demonstrates how to define a basic Vercel Function using the Web Handler signature. It exports a `GET` function that takes a `Request` object and returns a `Response` object. This signature is compatible with Next.js App Router and other frameworks, requiring Node.js 18 or later.
+SOURCE: https://vercel.com/docs/functions/functions-api-reference
+
+LANGUAGE: TypeScript
+CODE:
+```
+export function GET(request: Request) {
+  return new Response('Hello from Vercel!');
+}
+```
+
+----------------------------------------
+
+TITLE: Stream Text from OpenAI Model in Next.js API Route
+DESCRIPTION: Demonstrates how to create a Vercel Function (Next.js API route) to stream text responses from an OpenAI model using Vercel's AI SDK. The function sends a placeholder prompt to 'gpt-4o-mini' and returns the response as a text stream, setting the appropriate 'Content-Type' header for event streams.
+SOURCE: https://vercel.com/docs/functions/streaming-functions
+
+LANGUAGE: TypeScript
+CODE:
+```
+import { streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+ 
+// This method must be named GET
+export async function GET() {
+  // Make a request to OpenAI's API based on
+  // a placeholder prompt
+  const response = streamText({
+    model: openai('gpt-4o-mini'),
+    messages: [{ role: 'user', content: 'What is the capital of Australia?' }],
+  });
+  // Respond with the stream
+  return response.toTextStreamResponse({
+    headers: {
+      'Content-Type': 'text/event-stream'
+    }
+  });
+}
+```
+
+----------------------------------------
+
+TITLE: Next.js Edge Middleware for Dynamic Feature Rollback
+DESCRIPTION: This Next.js Edge Middleware snippet illustrates how to implement a dynamic emergency fallback mechanism using Vercel Edge Config. It checks a boolean variable (`isNewVersionActive`) from Edge Config to determine whether to serve the new Vercel feature or rewrite the request to a legacy server path, allowing for instant rollbacks without code deployments.
+SOURCE: https://vercel.com/docs/incremental-migration/migration-guide
+
+LANGUAGE: TypeScript
+CODE:
+```
+import { NextRequest, NextResponse } from 'next/server';
+import { get } from '@vercel/edge-config';
+ 
+export const config = {
+  matcher: ['/'], // URL to match
+};
+ 
+export async function middleware(request: NextRequest) {
+  try {
+    // Check whether the new version should be shown - isNewVersionActive is a boolean value stored in Edge Config that you can update from your Project dashboard without any code changes
+    const isNewVersionActive = await get<boolean>('isNewVersionActive');
+ 
+    // If `isNewVersionActive` is false, rewrite to the legacy server URL
+    if (!isNewVersionActive) {
+      request.nextUrl.pathname = `/legacy-path`;
+      return NextResponse.rewrite(request.nextUrl);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Secure Vercel Cron Jobs with Next.js Route Handlers
+DESCRIPTION: This snippet demonstrates how to secure Vercel cron job invocations using a Next.js App Router Route Handler. It validates the incoming `Authorization` header against a `CRON_SECRET` environment variable, returning a 401 Unauthorized response if the secret does not match. It also notes compatibility considerations for TypeScript versions below 5.2.
+SOURCE: https://vercel.com/docs/cron-jobs/manage-cron-jobs
+
+LANGUAGE: TypeScript
+CODE:
+```
+import type { NextRequest } from 'next/server';
+ 
+export function GET(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return new Response('Unauthorized', {
+      status: 401,
+    });
+  }
+ 
+  return Response.json({ success: true });
+}
+```
+
+----------------------------------------
+
+TITLE: Query an AWS RDS Instance with Vercel Functions
+DESCRIPTION: This example shows how to perform a database `SELECT` query on an AWS RDS instance from a Vercel function. It utilizes `@aws-sdk/rds-signer` for authentication token generation and `pg` for PostgreSQL client operations. The function initializes an RDS signer with OIDC credentials and a PostgreSQL connection pool, then executes a sample query against a specified database table. Required environment variables include `RDS_PORT`, `RDS_HOSTNAME`, `RDS_DATABASE`, `RDS_USERNAME`, `RDS_CA_PEM`, `AWS_REGION`, and `AWS_ROLE_ARN`.
+SOURCE: https://vercel.com/docs/oidc/aws
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm i @aws-sdk/rds-signer @vercel/functions pg
+```
+
+LANGUAGE: JavaScript
+CODE:
+```
+import { awsCredentialsProvider } from '@vercel/functions/oidc';
+import { Signer } from '@aws-sdk/rds-signer';
+import { Pool } from 'pg';
+ 
+const RDS_PORT = parseInt(process.env.RDS_PORT!);
+const RDS_HOSTNAME = process.env.RDS_HOSTNAME!;
+const RDS_DATABASE = process.env.RDS_DATABASE!;
+const RDS_USERNAME = process.env.RDS_USERNAME!;
+const RDS_CA_PEM = process.env.RDS_CA_PEM!;
+const AWS_REGION = process.env.AWS_REGION!;
+const AWS_ROLE_ARN = process.env.AWS_ROLE_ARN!;
+ 
+// Initialize the RDS Signer
+const signer = new Signer({
+  // Use the Vercel AWS SDK credentials provider
+  credentials: awsCredentialsProvider({
+    roleArn: AWS_ROLE_ARN,
+  }),
+  region: AWS_REGION,
+  port: RDS_PORT,
+  hostname: RDS_HOSTNAME,
+  username: RDS_USERNAME,
+});
+ 
+// Initialize the Postgres Pool
+const pool = new Pool({
+  password: signer.getAuthToken,
+  user: RDS_USERNAME,
+  host: RDS_HOSTNAME,
+  database: RDS_DATABASE,
+  port: RDS_PORT,
+});
+ 
+// Export the route handler
+export async function GET() {
+  try {
+    const client = await pool.connect();
+    const { rows } = await client.query('SELECT * FROM my_table');
+    return Response.json(rows);
+  } finally {
+    client.release();
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Next.js Rewrites with Fallback to Legacy Server
+DESCRIPTION: This Next.js configuration uses `async rewrites` with a `fallback` rule to direct all incoming traffic (`/:path*`) to a specified legacy site. This ensures that Vercel acts as the entry point but routes all requests to the existing server, allowing for gradual migration.
+SOURCE: https://vercel.com/docs/incremental-migration/migration-guide
+
+LANGUAGE: javascript
+CODE:
+```
+module.exports = {
+  async rewrites() {
+    return {
+      fallback: [
+        {
+          source: '/:path*',
+          destination: 'https://my-legacy-site.com/:path*',
+        },
+      ],
+    };
+  },
+};
+```
+
+----------------------------------------
+
+TITLE: Create a server-side upload route for Vercel Blob
+DESCRIPTION: This Next.js API route (Route Handler) receives the uploaded file, forwards it to Vercel Blob using `put`, and returns the resulting blob metadata as a JSON response. It handles filename extraction from search parameters and sets public access.
+SOURCE: https://vercel.com/docs/vercel-blob/server-upload
+
+LANGUAGE: TypeScript
+CODE:
+```
+import { put } from '@vercel/blob';
+import { NextResponse } from 'next/server';
+ 
+export async function POST(request: Request): Promise<NextResponse> {
+  const { searchParams } = new URL(request.url);
+  const filename = searchParams.get('filename');
+ 
+  const blob = await put(filename, request.body, {
+    access: 'public',
+    addRandomSuffix: true,
+  });
+ 
+  return NextResponse.json(blob);
+}
+```
+
+----------------------------------------
+
+TITLE: Accessing Environment Variables in Different Languages
+DESCRIPTION: This snippet demonstrates how to access a declared environment variable, such as API_URL, in various programming languages. Environment variables are typically accessed via language-specific methods or modules after being configured in the deployment environment.
+SOURCE: https://vercel.com/docs/environment-variables/managing-environment-variables
+
+LANGUAGE: Node.js
+CODE:
+```
+process.env.API_URL;
+```
+
+LANGUAGE: Go
+CODE:
+```
+os.Getenv("API_URL")
+```
+
+LANGUAGE: Python
+CODE:
+```
+os.environ.get('API_URL')
+```
+
+LANGUAGE: Ruby
+CODE:
+```
+ENV['API_URL']
+```
+
+----------------------------------------
+
+TITLE: Define Edge Middleware Function in TypeScript/JavaScript
+DESCRIPTION: This snippet demonstrates the basic structure for an Edge Middleware function. It must be a default export in a `middleware.ts` or `middleware.js` file located at the root of your `app` or `pages` directory.
+SOURCE: https://vercel.com/docs/edge-middleware/middleware-api
+
+LANGUAGE: TypeScript
+CODE:
+```
+export default function customName() {}
+```
+
+----------------------------------------
+
+TITLE: Defining Custom Tools for LLMs with AI SDK
+DESCRIPTION: Extend LLM capabilities by defining custom tools using the AI SDK's `tool` function. Each tool requires a description, Zod-validated parameters for input, and an `execute` function to perform the task. This example demonstrates creating 'weather' and 'activities' tools.
+SOURCE: https://vercel.com/docs/agents
+
+LANGUAGE: TypeScript
+CODE:
+```
+import { generateText, tool } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { z } from 'zod';
+ 
+export async function getWeather() {
+  const { text } = await generateText({
+    model: openai('gpt-4.1'),
+    prompt: 'What is the weather in San Francisco?',
+    tools: {
+      weather: tool({
+        description: 'Get the weather in a location',
+        parameters: z.object({
+          location: z.string().describe('The location to get the weather for')
+        }),
+        execute: async ({ location }) => ({
+          location,
+          temperature: 72 + Math.floor(Math.random() * 21) - 10
+        })
+      }),
+      activities: tool({
+        description: 'Get the activities in a location',
+        parameters: z.object({
+          location: z
+            .string()
+            .describe('The location to get the activities for')
+        }),
+        execute: async ({ location }) => ({
+          location,
+          activities: ['hiking', 'swimming', 'sightseeing']
+        })
+      })
+    }
+  });
+  console.log(text);
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Background Revalidation for ISR
+DESCRIPTION: This snippet demonstrates how to configure background revalidation for Incremental Static Regeneration (ISR) in a Next.js application using the App Router. By setting the `revalidate` export, the page's cache will be purged and revalidated automatically every 10 seconds. This configuration is applicable across Next.js (/app), Next.js (/pages), SvelteKit, and Nuxt contexts.
+SOURCE: https://vercel.com/docs/incremental-static-regeneration/quickstart
+
+LANGUAGE: TypeScript
+CODE:
+```
+export const revalidate = 10; // seconds
+```
+
+----------------------------------------
+
+TITLE: Implement Periodic Backup for Vercel Blob using Cron Jobs
+DESCRIPTION: This TypeScript code provides an example of a periodic backup solution for Vercel Blob. Designed to run as a Next.js API route (suitable for Cron Jobs), it iterates through all blobs, fetches their content, and streams them directly to an AWS S3 bucket. This method optimizes memory usage by avoiding buffering and includes logic for handling large datasets by resuming from a cursor.
+SOURCE: https://vercel.com/docs/vercel-blob/examples
+
+LANGUAGE: TypeScript
+CODE:
+```
+import { Readable } from "node:stream";
+import { S3Client } from "@aws-sdk/client-s3";
+import { list } from "@vercel/blob";
+import { Upload } from "@aws-sdk/lib-storage";
+import type { NextRequest } from "next/server";
+import type { ReadableStream } from "node:stream/web";
+ 
+export async function GET(request: NextRequest) {
+  const authHeader = request.headers.get("authorization");
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return new Response("Unauthorized", {
+      status: 401,
+    });
+  }
+ 
+  const s3 = new S3Client({
+    region: "us-east-1",
+  });
+ 
+  let cursor: string | undefined;
+ 
+  do {
+    const listResult = await list({
+      cursor,
+      limit: 250,
+    });
+ 
+    if (listResult.blobs.length > 0) {
+      await Promise.all(
+        listResult.blobs.map(async (blob) => {
+          const res = await fetch(blob.url);
+          if (res.body) {
+            const parallelUploads3 = new Upload({
+              client: s3,
+              params: {
+                Bucket: "vercel-blob-backup",
+                Key: blob.pathname,
+                Body: Readable.fromWeb(res.body as ReadableStream),
+              },
+              leavePartsOnError: false,
+            });
+ 
+            await parallelUploads3.done();
+          }
+        })
+      );
+    }
+ 
+    cursor = listResult.cursor;
+  } while (cursor);
+ 
+  return new Response("Backup done!");
+}
+```
+
+----------------------------------------
+
+TITLE: PUBLIC_VERCEL_PROJECT_PRODUCTION_URL Environment Variable
+DESCRIPTION: Defines a production domain name for the project, prioritizing the shortest custom domain or a `vercel.app` domain. This variable is consistently set, even for preview deployments, and is useful for generating reliable production-pointing links like OG-image URLs. The value does not include the `https://` protocol scheme.
+SOURCE: https://vercel.com/docs/environment-variables/framework-environment-variables
+
+LANGUAGE: Environment Variables
+CODE:
+```
+PUBLIC_VERCEL_PROJECT_PRODUCTION_URL=my-site.com
+```
+
+----------------------------------------
+
+TITLE: Continuing Middleware Chain with NextResponse.next() and Custom Headers
+DESCRIPTION: The `NextResponse.next()` helper instructs the Edge Function to continue processing the middleware chain. This example demonstrates how to add custom headers to both the request (for subsequent middleware) and the response.
+SOURCE: https://vercel.com/docs/edge-middleware/middleware-api
+
+LANGUAGE: TypeScript
+CODE:
+```
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+ 
+export function middleware(request: NextRequest) {
+  // Clone the request headers and set a new header `x-hello-from-middleware1`
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-hello-from-middleware1', 'hello');
+ 
+  // You can also set request headers in NextResponse.next
+  const response = NextResponse.next({
+    request: {
+      // New request headers
+      headers: requestHeaders,
+    },
+  });
+ 
+  // Set a new response header `x-hello-from-middleware2`
+  response.headers.set('x-hello-from-middleware2', 'hello');
+  return response;
+}
+```
+
+----------------------------------------
+
+TITLE: Embed Payment Processor iframe Component in React
+DESCRIPTION: This React/JSX component demonstrates how to embed a payment processor's iframe into an application. It sets up a secure conduit for payment data, utilizing the `sandbox` attribute with `allow-forms`, `allow-top-navigation`, and `allow-same-origin` to control iframe permissions and enhance security.
+SOURCE: https://vercel.com/docs/security/pci-dss
+
+LANGUAGE: React/TypeScript
+CODE:
+```
+const PaymentProcessorIframe = (): JSX.Element => {
+  const paymentProcessorIframeURL = `https://${PAYMENT_PROCESSOR_BASE_URL}.com/secure-payment-form`;
+ 
+  return (
+    <div className="container mx-auto my-10 rounded bg-white p-5 shadow-md">
+      <iframe
+        src={paymentProcessorIframeURL}
+        frameBorder="0"
+        width="100%"
+        height="500px"
+        sandbox="allow-forms allow-top-navigation allow-same-origin"
+        className="h-auto w-full"
+      />
+    </div>
+  );
+};
+ 
+export default PaymentProcessorIframe;
+```
+
+----------------------------------------
+
+TITLE: Upload File to Vercel Blob using Next.js Server Action
+DESCRIPTION: Demonstrates how to create a Next.js Server Action to upload an image file to Vercel Blob. It uses `put` from `@vercel/blob` to store the file publicly with a random suffix and revalidates the path.
+SOURCE: https://vercel.com/docs/vercel-blob/server-upload
+
+LANGUAGE: typescript
+CODE:
+```
+import { put } from '@vercel/blob';
+import { revalidatePath } from 'next/cache';
+ 
+export async function Form() {
+  async function uploadImage(formData: FormData) {
+    'use server';
+    const imageFile = formData.get('image') as File;
+    const blob = await put(imageFile.name, imageFile, {
+      access: 'public',
+      addRandomSuffix: true,
+    });
+    revalidatePath('/');
+    return blob;
+  }
+ 
+  return (
+    <form action={uploadImage}>
+      <label htmlFor="image">Image</label>
+      <input
+        type="file"
+        id="image"
+        name="image"
+        accept="image/jpeg, image/png, image/webp"
+        required
+      />
+      <button>Upload</button>
+    </form>
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Configure SPA Fallback: Legacy Routes vs. Modern Rewrites
+DESCRIPTION: This snippet demonstrates how to configure a Single Page Application (SPA) fallback, serving `index.html` for all paths that do not match a file in the filesystem. It compares the legacy `routes` approach, which requires explicit filesystem handling, with the modern `rewrites` approach, where filesystem checks are the default behavior.
+SOURCE: https://vercel.com/docs/project-configuration
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}
+```
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
+```
+
+----------------------------------------
+
+TITLE: Building and Deploying Vercel Projects with GitLab Pipelines
+DESCRIPTION: Demonstrates how to integrate Vercel CLI commands into GitLab Pipelines. Use `vercel build` to build the project within GitLab, and `vercel deploy --prebuilt` to upload the pre-built `.vercel/output` folder to Vercel, enabling custom CI/CD workflows without exposing source code.
+SOURCE: https://vercel.com/docs/git/vercel-for-gitlab
+
+LANGUAGE: Shell
+CODE:
+```
+vercel build
+vercel deploy --prebuilt
+```
+
+----------------------------------------
+
+TITLE: Implement Edge Middleware for Dynamic Rewrites with Edge Config
+DESCRIPTION: This Edge Middleware example demonstrates how to dynamically rewrite requests at the edge using Vercel's Edge Config. It fetches rewrite rules from Edge Config and applies them based on the request's pathname, providing flexibility without redeployment and immediate rollback capabilities. It's configured to match all paths except API routes, static assets, and favicon.
+SOURCE: https://vercel.com/docs/incremental-migration/migration-guide
+
+LANGUAGE: typescript
+CODE:
+```
+import { get } from '@vercel/edge-config';
+import { NextRequest, NextResponse } from 'next/server';
+ 
+export const config = {
+  matcher: '/((?!api|_next/static|favicon.ico).*),'
+};
+ 
+export default async function middleware(request: NextRequest) {
+  const url = request.nextUrl;
+  const rewrites = await get('rewrites'); // Get rewrites stored in Edge Config
+ 
+  for (const rewrite of rewrites) {
+    if (rewrite.source === url.pathname) {
+      url.pathname = rewrite.destination;
+      return NextResponse.rewrite(url);
+    }
+  }
+ 
+  return NextResponse.next();
+}
+```
+
+----------------------------------------
+
+TITLE: Connect Vercel Project to Groq AI Model (Next.js App Router)
+DESCRIPTION: This JavaScript code snippet demonstrates how to set up an API route in a Next.js App Router (`app/api/chat/route.ts`) to stream text responses using the `@ai-sdk/groq` package and the `llama-3.1-8b-instant` model. It handles incoming chat messages and streams the AI model's response back.
+SOURCE: https://vercel.com/docs/ai/groq
+
+LANGUAGE: TypeScript
+CODE:
+```
+// app/api/chat/route.ts
+import { groq } from '@ai-sdk/groq';import { streamText } from 'ai';
+// Allow streaming responses up to 30 secondsexport const maxDuration = 30;
+export async function POST(req: Request) {  // Extract the `messages` from the body of the request  const { messages } = await req.json();
+  // Call the language model  const result = streamText({    model: groq('llama-3.1-8b-instant'),    messages,  });
+  // Respond with the stream  return result.toDataStreamResponse();}
+```
+
+----------------------------------------
+
+TITLE: VERCEL_ENV Environment Variable
+DESCRIPTION: The environment that the app is deployed and running on. The value can be either `production`, `preview`, or `development`. Available at both build and runtime.
+SOURCE: https://vercel.com/docs/environment-variables/system-environment-variables
+
+LANGUAGE: Shell
+CODE:
+```
+VERCEL_ENV=production
+```
+
+----------------------------------------
+
+TITLE: Implement Next.js API Routes for Replicate Predictions
+DESCRIPTION: These Next.js API routes (/api/predictions and /api/predictions/[id]) handle the creation and retrieval of AI model predictions via the Replicate API. The POST route initiates a prediction, optionally configuring webhooks for status updates, while the GET route polls for the status of an existing prediction by its ID.
+SOURCE: https://vercel.com/docs/ai/replicate
+
+LANGUAGE: TypeScript
+CODE:
+```
+// app/api/predictions/route.ts
+import { NextResponse } from 'next/server';import Replicate from 'replicate';
+const replicate = new Replicate({  auth: process.env.REPLICATE_API_TOKEN,});
+// In production and preview deployments (on Vercel), the VERCEL_URL environment variable is set.// In development (on your local machine), the NGROK_HOST environment variable is set.const WEBHOOK_HOST = process.env.VERCEL_URL  ? `https://${process.env.VERCEL_URL}`  : process.env.NGROK_HOST;
+export async function POST(request) {  if (!process.env.REPLICATE_API_TOKEN) {    throw new Error(      'The REPLICATE_API_TOKEN environment variable is not set. See README.md for instructions on how to set it.',    );
+  }
+  const { prompt } = await request.json();
+  const options = {    version: '8beff3369e81422112d93b89ca01426147de542cd4684c244b673b105188fe5f',    input: { prompt },  };
+  if (WEBHOOK_HOST) {    options.webhook = `${WEBHOOK_HOST}/api/webhooks`;    options.webhook_events_filter = ['start', 'completed'];  }
+  // A prediction is the result you get when you run a model, including the input, output, and other details  const prediction = await replicate.predictions.create(options);
+  if (prediction?.error) {    return NextResponse.json({ detail: prediction.error }, { status: 500 });  }
+  return NextResponse.json(prediction, { status: 201 });}
+// app/api/predictions/[id]/route.ts
+import { NextResponse } from 'next/server';import Replicate from 'replicate';
+const replicate = new Replicate({  auth: process.env.REPLICATE_API_TOKEN,});
+// Poll for the prediction's statusexport async function GET(request, { params }) {  const { id } = params;  const prediction = await replicate.predictions.get(id);
+  if (prediction?.error) {    return NextResponse.json({ detail: prediction.error }, { status: 500 });  }
+  return NextResponse.json(prediction);}
+```
+
+----------------------------------------
+
+TITLE: Configure Next.js Function for Edge Runtime
+DESCRIPTION: This snippet demonstrates how to convert a Vercel Function into an Edge Function within a Next.js application. By setting `export const runtime = 'edge'`, the function is configured to execute on the Edge Network, providing a basic GET handler that returns a simple response.
+SOURCE: https://vercel.com/docs/functions/runtimes/edge
+
+LANGUAGE: JavaScript
+CODE:
+```
+export const runtime = 'edge'; // 'nodejs' is the default
+ 
+export function GET(request: Request) {
+  return new Response(`I am an Edge Function!`, {
+    status: 200,
+  });
+}
+```
+
+----------------------------------------
+
+TITLE: Deploying Vercel Project from Current Directory
+DESCRIPTION: Deploys the Vercel project located in the current working directory using the `vercel` command. This is the simplest way to initiate a deployment.
+SOURCE: https://vercel.com/docs/cli/deploying-from-cli
+
+LANGUAGE: Shell
+CODE:
+```
+vercel
+```
+
+----------------------------------------
+
+TITLE: Vercel API Route for GCP Vertex AI Text Generation with OIDC
+DESCRIPTION: This Vercel API route demonstrates how to connect to GCP Vertex AI using OIDC. It initializes an `ExternalAccountClient` with Vercel's OIDC token, configures the `@ai-sdk/google-vertex` provider, and then uses `generateText` to create a vegetarian lasagna recipe from a prompt.
+SOURCE: https://vercel.com/docs/oidc/gcp
+
+LANGUAGE: TypeScript
+CODE:
+```
+import { getVercelOidcToken } from '@vercel/functions/oidc';
+import { ExternalAccountClient } from 'google-auth-library';
+import { createVertex } from '@ai-sdk/google-vertex';
+import { generateText } from 'ai';
+ 
+const GCP_PROJECT_ID = process.env.GCP_PROJECT_ID;
+const GCP_PROJECT_NUMBER = process.env.GCP_PROJECT_NUMBER;
+const GCP_SERVICE_ACCOUNT_EMAIL = process.env.GCP_SERVICE_ACCOUNT_EMAIL;
+const GCP_WORKLOAD_IDENTITY_POOL_ID = process.env.GCP_WORKLOAD_IDENTITY_POOL_ID;
+const GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID =
+  process.env.GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID;
+ 
+// Initialize the External Account Client
+const authClient = ExternalAccountClient.fromJSON({
+  type: 'external_account',
+  audience: `//iam.googleapis.com/projects/${GCP_PROJECT_NUMBER}/locations/global/workloadIdentityPools/${GCP_WORKLOAD_IDENTITY_POOL_ID}/providers/${GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID}`,
+  subject_token_type: 'urn:ietf:params:oauth:token-type:jwt',
+  token_url: 'https://sts.googleapis.com/v1/token',
+  service_account_impersonation_url: `https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/${GCP_SERVICE_ACCOUNT_EMAIL}:generateAccessToken`,
+  subject_token_supplier: {
+    // Use the Vercel OIDC token as the subject token
+    getSubjectToken: getVercelOidcToken,
+  },
+});
+ 
+const vertex = createVertex({
+  project: GCP_PROJECT_ID,
+  location: 'us-central1',
+  googleAuthOptions: {
+    authClient,
+    projectId: GCP_PROJECT_ID,
+  },
+});
+ 
+// Export the route handler
+export const GET = async (req: Request) => {
+  const result = generateText({
+    model: vertex('gemini-1.5-flash'),
+    prompt: 'Write a vegetarian lasagna recipe for 4 people.',
+  });
+  return Response.json(result);
+};
+```
+
+----------------------------------------
+
+TITLE: Initialize Statsig with Edge Config in Next.js Edge Middleware
+DESCRIPTION: This example demonstrates how to set up a Statsig experiment using Edge Config within a Next.js Edge Middleware file. It leverages `statsig-node-vercel` and `@vercel/edge-config` to dynamically fetch feature flag configurations, ensuring all logged events are flushed before the middleware exits.
+SOURCE: https://vercel.com/docs/edge-config/edge-config-integrations/statsig-edge-config
+
+LANGUAGE: TypeScript
+CODE:
+```
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import Statsig from 'statsig-node';
+import { createClient } from '@vercel/edge-config';
+import { EdgeConfigDataAdapter } from 'statsig-node-vercel';
+ 
+export const config = {
+  matcher: '/',
+};
+ 
+const edgeConfigClient = createClient(process.env.EDGE_CONFIG!);
+const dataAdapter = new EdgeConfigDataAdapter({
+  edgeConfigClient: edgeConfigClient,
+  edgeConfigItemKey: process.env.EDGE_CONFIG_ITEM_KEY!,
+});
+ 
+export async function middleware(request: NextRequest) {
+  await Statsig.initialize('statsig-server-api-key-here', { dataAdapter });
+ 
+  const experiment = await Statsig.getExperiment(
+    { userID: 'exampleId' },
+    'statsig_example_experiment',
+  );
+ 
+  // Do any other experiment actions here
+ 
+  // Ensure that all logged events are flushed to Statsig servers before the middleware exits
+  event.waitUntil(Statsig.flush());
+ 
+  return NextResponse.next();
+}
+```
+
+----------------------------------------
+
+TITLE: Exporting Vercel Project Environment Variables for Local Development
+DESCRIPTION: Explains how to export Vercel Project environment variables to a local `.env` file using `vercel env pull` for frameworks like Next.js or Gatsby. It also shows how to temporarily override variables for a single command execution.
+SOURCE: https://vercel.com/docs/cli/env
+
+LANGUAGE: Shell
+CODE:
+```
+vercel env pull [file]
+```
+
+LANGUAGE: Shell
+CODE:
+```
+MY_ENV_VAR="temporary value" next dev
+```
+
+----------------------------------------
+
+TITLE: Automated AI Deployment and Ownership Transfer Workflow
+DESCRIPTION: Details a six-step process for an AI agent to programmatically deploy applications to Vercel and transfer their ownership to an end-user. The workflow leverages Vercel's API for file uploads, deployment creation, and project transfer requests, culminating in a user-facing claim URL.
+SOURCE: https://vercel.com/docs/deployments/claim-deployments
+
+LANGUAGE: APIDOC
+CODE:
+```
+Workflow Steps:
+1. File Upload:
+   Method: POST
+   Endpoint: /files
+   Purpose: AI agent uploads deployment files to Vercel.
+
+2. Deployment Creation:
+   Option A: Vercel CLI
+   Option B: Vercel API
+     Method: POST
+     Endpoint: /files (followed by) POST /deployments
+     Purpose: Creates a new deployment on Vercel.
+
+3. Project Transfer Request:
+   Method: POST
+   Endpoint: /projects/:idOrName/transfer-request
+   Purpose: Initiates a transfer request, returning a 'code' for ownership transfer.
+
+4. Generate Claim URL:
+   Format: https://vercel.com/claim-deployment?code=xxx&returnUrl=https://xxx
+   Purpose: Agent generates and shares this URL with the end user.
+
+5. User Claims Deployment:
+   Action: User accesses the claim page via the URL and selects a team.
+
+6. Project Transfer Completion:
+   Method: PUT
+   Endpoint: /projects/transfer-request/:code
+   Purpose: Vercel API completes the transfer to the user's selected team. (Not required if using the Claim Deployments Flow directly).
+```
+
+----------------------------------------
+
+TITLE: Proxy External API Requests with Rewrites
+DESCRIPTION: Shows how to configure an external rewrite to forward requests from a local path (e.g., `/api/users`) to an external API endpoint (e.g., `https://api.example.com/users`). This allows Vercel to act as a reverse proxy, hiding the actual API endpoint from the browser.
+SOURCE: https://vercel.com/docs/rewrites
+
+LANGUAGE: JSON
+CODE:
+```
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://api.example.com/:path*"
+    }
+  ]
+}
+```
+
+----------------------------------------
+
+TITLE: Upload a Public Blob with Vercel Blob SDK
+DESCRIPTION: This JavaScript snippet demonstrates how to upload a file, referred to as a 'blob', to Vercel Blob storage. It uses the `put` function from the `@vercel/blob` SDK, specifying the filename, file content, and setting `access: 'public'` to make the uploaded blob publicly accessible.
+SOURCE: https://vercel.com/docs/vercel-blob
+
+LANGUAGE: JavaScript
+CODE:
+```
+import { put } from '@vercel/blob';
+ 
+const blob = await put('avatar.jpg', imageFile, {
+  access: 'public',
+});
+```
+
+----------------------------------------
+
+TITLE: List Objects in an AWS S3 Bucket with Vercel Functions
+DESCRIPTION: This example demonstrates how to list objects in an AWS S3 bucket from a Vercel function. It uses the `@aws-sdk/client-s3` package and the `@vercel/functions/oidc` credentials provider to authenticate with AWS using OIDC. The function initializes an S3 client and sends a `ListObjectsV2Command` to retrieve object keys from a specified S3 bucket. Required environment variables include `AWS_REGION`, `AWS_ROLE_ARN`, and `S3_BUCKET_NAME`.
+SOURCE: https://vercel.com/docs/oidc/aws
+
+LANGUAGE: Shell
+CODE:
+```
+pnpm i @aws-sdk/client-s3 @vercel/functions
+```
+
+LANGUAGE: JavaScript
+CODE:
+```
+import * as S3 from '@aws-sdk/client-s3';
+import { awsCredentialsProvider } from '@vercel/functions/oidc';
+ 
+const AWS_REGION = process.env.AWS_REGION!;
+const AWS_ROLE_ARN = process.env.AWS_ROLE_ARN!;
+const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME!;
+ 
+// Initialize the S3 Client
+const s3client = new S3.S3Client({
+  region: AWS_REGION,
+  // Use the Vercel AWS SDK credentials provider
+  credentials: awsCredentialsProvider({
+    roleArn: AWS_ROLE_ARN,
+  }),
+});
+ 
+export async function GET() {
+  const result = await s3client.send(
+    new S3.ListObjectsV2Command({
+      Bucket: S3_BUCKET_NAME,
+    }),
+  );
+  return result?.Contents?.map((object) => object.Key) ?? [];
+}
+```
+
+----------------------------------------
+
+TITLE: Vercel Functions Node.js Runtime General Limits Overview
+DESCRIPTION: Outlines the general operational limits and restrictions for Vercel Functions using the Node.js runtime across different Vercel plans, including memory, duration, bundle size, concurrency, cost, regions, and API coverage.
+SOURCE: https://vercel.com/docs/functions/limitations
+
+LANGUAGE: APIDOC
+CODE:
+```
+Feature: Maximum memory
+  Hobby: 1024 MB
+  Pro and Ent: 3009 MB
+Feature: Maximum duration
+  Hobby: 10s (default) - configurable up to 60s
+  Pro: 15s (default) - configurable up to 300s
+  Ent: 15s (default) - configurable up to 900s
+  Fluid compute enabled: values increased across plans
+Feature: Size (after gzip compression)
+  250 MB
+Feature: Concurrency
+  Auto-scales up to 30,000 (Hobby and Pro)
+  Auto-scales up to 100,000+ (Enterprise)
+Feature: Cost
+  Pay for wall-clock time
+Feature: Regions
+  Executes region-first, can customize location
+  Enterprise teams can set multiple regions
+Feature: API Coverage
+  Full Node.js coverage
+```
+
+----------------------------------------
+
+TITLE: Vercel Project Configuration: `functions` Property Definition
+DESCRIPTION: Configures custom settings for Serverless Functions using glob patterns to match function paths. Each matched function can have its runtime, memory, max duration, and file inclusions/exclusions customized.
+SOURCE: https://vercel.com/docs/project-configuration
+
+LANGUAGE: APIDOC
+CODE:
+```
+functions: Object
+  Description: Defines custom settings for Serverless Functions.
+  Key definition: String (glob pattern)
+    Description: Matches the paths of Serverless Functions to customize.
+    Examples:
+      - api/*.js (matches one level e.g. api/hello.js but not api/hello/world.js)
+      - api/**/*.ts (matches all levels api/hello.ts and api/hello/world.ts)
+      - src/pages/**/* (matches all functions from src/pages)
+      - api/test.js
+  Value definition: Object
+    runtime (optional): String
+      Description: The npm package name of a Runtime, including its version.
+    memory (optional): Integer
+      Description: Memory in MB for your Serverless Function (between 128 and 3009).
+    maxDuration (optional): Integer
+      Description: How long your Serverless Function should be allowed to run on every request in seconds (between 1 and the maximum limit of your plan).
+    includeFiles (optional): String (glob pattern)
+      Description: Matches files that should be included in your Serverless Function. (Not supported in Next.js, instead use outputFileTracingIncludes in next.config.js)
+    excludeFiles (optional): String (glob pattern)
+      Description: Matches files that should be excluded from your Serverless Function. (Not supported in Next.js, instead use outputFileTracingIncludes in next.config.js)
+```
+
+----------------------------------------
+
+TITLE: Create Vercel Function with Web Signature (TypeScript)
+DESCRIPTION: This snippet demonstrates the simplest way to define a Vercel Function using the Web signature. It exports a `GET` function that takes a `Request` object and returns a basic 'Hello from Vercel!' response.
+SOURCE: https://vercel.com/docs/functions/runtimes/node-js
+
+LANGUAGE: TypeScript
+CODE:
+```
+export function GET(request: Request) {
+  return new Response('Hello from Vercel!');
+}
+```
+
+----------------------------------------
+
+TITLE: Create Sensitive Environment Variables
+DESCRIPTION: This section provides examples for creating sensitive environment variables in Vercel, which are crucial for securing sensitive data like API keys. Sensitive variables are stored in an unreadable format and can only be created in production and preview environments. Examples are provided for both cURL and the Vercel SDK.
+SOURCE: https://vercel.com/docs/environment-variables/sensitive-environment-variables
+
+LANGUAGE: curl
+CODE:
+```
+curl --request POST \
+  --url https://api.vercel.com/v10/projects/<project-id-or-name>/env \
+  --header "Authorization: Bearer $VERCEL_TOKEN" \
+  --header "Content-Type: application/json" \
+  --data '[
+    {
+      "key": "<env-key-1>",
+      "value": "<env-value-1>",
+      "type": "sensitive",
+      "target": ["<target-environment>"],
+      "gitBranch": "<git-branch>",
+      "comment": "<comment>",
+      "customEnvironmentIds": ["<custom-env-id>"]
+    }
+  ]'
+```
+
+LANGUAGE: javascript
+CODE:
+```
+import { Vercel } from '@vercel/sdk';
+ 
+const vercel = new Vercel({
+  bearerToken: '<YOUR_BEARER_TOKEN_HERE>',
+});
+ 
+async function run() {
+  const result = await vercel.projects.createProjectEnv({
+    idOrName: '<project-id-or-name>',
+    requestBody: {
+      key: '<env-key-1>',
+      value: '<env-value-1>',
+      type: 'sensitive',
+      target: ['<target-environment>'],
+      gitBranch: '<git-branch>',
+      comment: '<comment>',
+      customEnvironmentIds: ['<custom-env-id>']
+    }
+  });
+ 
+  // Handle the result
+  console.log(result);
+}
+ 
+run();
+```
+
+----------------------------------------
+
+TITLE: Install Vercel CLI Globally
+DESCRIPTION: This snippet demonstrates how to install the Vercel CLI globally on your system using pnpm, a fast package manager. The command is also applicable with npm, yarn, or bun by replacing 'pnpm' with the respective package manager.
+SOURCE: https://vercel.com/docs/cli
+
+LANGUAGE: pnpm
+CODE:
+```
+pnpm i -g vercel
+```
+
+----------------------------------------
+
+TITLE: Schedule Post-Response Work with Next.js after()
+DESCRIPTION: Demonstrates using `after()` from `next/server` in Next.js 13.4+ to schedule asynchronous tasks that execute after the HTTP response is sent or prerendering completes. This prevents blocking the response for side effects like logging or analytics.
+SOURCE: https://vercel.com/docs/functions/functions-api-reference/vercel-functions-package
+
+LANGUAGE: TypeScript
+CODE:
+```
+import { after } from 'next/server';
+ 
+export async function GET(request: Request) {
+  const country = request.headers.get('x-vercel-ip-country') || 'unknown';
+ 
+  // Returns a response immediately
+  const response = new Response(`You're visiting from ${country}`);
+ 
+  // Schedule a side-effect after the response is sent
+  after(async () => {
+    // For example, log or increment analytics in the background
+    await fetch(
+      `https://my-analytics-service.example.com/log?country=${country}`,
+    );
+  });
+ 
+  return response;
+}
+```
+
+----------------------------------------
+
+TITLE: Implement On-Demand Revalidation API Route
+DESCRIPTION: This snippet provides an example of an API route designed to trigger on-demand revalidation for a specific path (`/blog-posts`). It requires a secret token passed as a query parameter (`?secret`) to prevent unauthorized revalidation. If the secret matches an environment variable, `revalidatePath` is called to purge the cache for the specified route. This is primarily for Next.js applications but the concept applies to other frameworks with similar API route capabilities.
+SOURCE: https://vercel.com/docs/incremental-static-regeneration/quickstart
+
+LANGUAGE: TypeScript
+CODE:
+```
+import { revalidatePath } from 'next/cache';
+ 
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  if (searchParams?.secret !== process.env.MY_SECRET_TOKEN) {
+    return new Response(`Invalid credentials`, {
+      status: 500,
+    });
+  }
+  revalidatePath('/blog-posts');
+  return new Response(
+    {
+      revalidated: true,
+      now: Date.now(),
+    },
+    {
+      status: 200,
+    },
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Fetch and Render Data with ISR Background Revalidation Example
+DESCRIPTION: This example demonstrates a complete page component that fetches a list of blog posts from an external API and renders them. It utilizes Incremental Static Regeneration (ISR) with background revalidation set to 10 seconds, ensuring the data is refreshed periodically or on page visits. This code is applicable to Next.js (/app), Next.js (/pages), SvelteKit, and Nuxt frameworks.
+SOURCE: https://vercel.com/docs/incremental-static-regeneration/quickstart
+
+LANGUAGE: TypeScript
+CODE:
+```
+export const revalidate = 10; // seconds
+ 
+interface Post {
+  title: string;
+  id: number;
+}
+ 
+export default async function Page() {
+  const res = await fetch('https://api.vercel.app/blog');
+  const posts = (await res.json()) as Post[];
+  return (
+    <ul>
+      {posts.map((post: Post) => {
+        return <li key={post.id}>{post.title}</li>;
+      })}
+    </ul>
+  );
+}
+```

@@ -1,0 +1,1144 @@
+TITLE: Implementing Basic Transactions with Bun SQL
+DESCRIPTION: This snippet shows how to perform a basic database transaction using `sql.begin`. It reserves a dedicated connection, executes multiple queries within a callback, and automatically commits if no errors occur or rolls back if an error is thrown, ensuring atomicity.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/api/sql.md#_snippet_16
+
+LANGUAGE: ts
+CODE:
+```
+await sql.begin(async tx => {
+  // All queries in this function run in a transaction
+  await tx`INSERT INTO users (name) VALUES (${"Alice"})`;
+  await tx`UPDATE accounts SET balance = balance - 100 WHERE user_id = 1`;
+
+  // Transaction automatically commits if no errors are thrown
+  // Rolls back if any error occurs
+});
+```
+
+----------------------------------------
+
+TITLE: Creating a Simple Web Server with Bun.serve (TypeScript)
+DESCRIPTION: This snippet demonstrates how to create a basic HTTP web server using Bun's `Bun.serve` API. It defines a `fetch` handler that logs the incoming request URL to the console and returns a "Hello, world!" response for every request.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/guides/runtime/web-debugger.md#_snippet_0
+
+LANGUAGE: TypeScript
+CODE:
+```
+Bun.serve({
+  fetch(req){
+    console.log(req.url);
+    return new Response("Hello, world!");
+  }
+})
+```
+
+----------------------------------------
+
+TITLE: Creating a Basic Elysia Server in TypeScript
+DESCRIPTION: This snippet demonstrates how to initialize an Elysia application, define a simple GET route that returns 'Hello Elysia', and start the server listening on port 8080. It showcases Elysia's straightforward API for building web services with Bun.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/ecosystem/elysia.md#_snippet_0
+
+LANGUAGE: TypeScript
+CODE:
+```
+import { Elysia } from 'elysia'
+
+const app = new Elysia()
+	.get('/', () => 'Hello Elysia')
+	.listen(8080)
+
+console.log(`🦊 Elysia is running at on port ${app.server.port}...`)
+```
+
+----------------------------------------
+
+TITLE: Creating a Basic HTTP Server with Bun (TypeScript)
+DESCRIPTION: This snippet initializes an HTTP server using `Bun.serve` on port 3000. It defines a `fetch` handler that returns a simple 'Welcome to Bun!' response for all incoming requests. After starting the server, it logs the server's URL to the console.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/guides/http/simple.md#_snippet_0
+
+LANGUAGE: TypeScript
+CODE:
+```
+const server = Bun.serve({
+  port: 3000,
+  fetch(request) {
+    return new Response("Welcome to Bun!");
+  }
+});
+
+console.log(`Listening on ${server.url}`);
+```
+
+----------------------------------------
+
+TITLE: Automatic Algorithm Detection in Bun.password.verify
+DESCRIPTION: The `Bun.password.verify` function automatically detects the hashing algorithm used to create the input hash. It can correctly infer the algorithm from both PHC-encoded (Argon2) and MCF-encoded (bcrypt) hashes, simplifying verification logic.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/api/hashing.md#_snippet_2
+
+LANGUAGE: ts
+CODE:
+```
+const password = "super-secure-pa$$word";
+
+const hash = await Bun.password.hash(password, {
+  /* config */
+});
+
+const isMatch = await Bun.password.verify(password, hash);
+// => true
+```
+
+----------------------------------------
+
+TITLE: Configuring Scoped Private Registries in Bun (TOML)
+DESCRIPTION: This TOML snippet illustrates how to configure private registries for specific organizations (scopes) within `bunfig.toml`. It provides examples for string-based URLs, username/password authentication (including environment variable references), and token-based authentication (also with environment variable references). These settings apply only to packages under the specified scopes.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/install/registries.md#_snippet_1
+
+LANGUAGE: TOML
+CODE:
+```
+[install.scopes]
+# registry as string
+"@myorg1" = "https://username:password@registry.myorg.com/"
+
+# registry with username/password
+# you can reference environment variables
+"@myorg2" = { username = "myusername", password = "$NPM_PASS", url = "https://registry.myorg.com/" }
+
+# registry with token
+"@myorg3" = { token = "$npm_token", url = "https://registry.myorg.com/" }
+```
+
+----------------------------------------
+
+TITLE: Configure Hashing Algorithms with Bun.password.hash
+DESCRIPTION: This example shows how to specify and configure different hashing algorithms, such as 'argon2id' (the default) or 'bcrypt', by passing a `params` object as the second argument to `Bun.password.hash`. You can adjust parameters like memory cost, time cost, and bcrypt cost.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/api/hashing.md#_snippet_1
+
+LANGUAGE: ts
+CODE:
+```
+const password = "super-secure-pa$$word";
+
+// use argon2 (default)
+const argonHash = await Bun.password.hash(password, {
+  algorithm: "argon2id", // "argon2id" | "argon2i" | "argon2d"
+  memoryCost: 4, // memory usage in kibibytes
+  timeCost: 3 // the number of iterations
+});
+
+// use bcrypt
+const bcryptHash = await Bun.password.hash(password, {
+  algorithm: "bcrypt",
+  cost: 4 // number between 4-31
+});
+```
+
+----------------------------------------
+
+TITLE: Writing a String to an Absolute Path using Bun.write() in TypeScript
+DESCRIPTION: This snippet demonstrates writing a string to a file at a specified absolute path using `Bun.write()`. The first argument is the absolute file path, and the second is the string data to be written. This method efficiently writes data to disk.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/guides/write-file/basic.md#_snippet_0
+
+LANGUAGE: ts
+CODE:
+```
+const path = "/path/to/file.txt";
+await Bun.write(path, "Lorem ipsum");
+```
+
+----------------------------------------
+
+TITLE: Sending a POST Request with JSON Body using Fetch in Bun
+DESCRIPTION: This snippet illustrates how to send an HTTP POST request to an API endpoint using Bun's fetch API. It includes a JSON request body and sets the Content-Type header, then parses the JSON response.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/guides/http/fetch.md#_snippet_1
+
+LANGUAGE: TypeScript
+CODE:
+```
+const response = await fetch("https://bun.sh/api", {
+  method: "POST",
+  body: JSON.stringify({ message: "Hello from Bun!" }),
+  headers: { "Content-Type": "application/json" }
+});
+
+const body = await response.json();
+```
+
+----------------------------------------
+
+TITLE: Performing React Server-Side Rendering with Bun.js (JavaScript)
+DESCRIPTION: This snippet sets up a Bun.js HTTP server that performs server-side rendering of a simple React component. It uses `renderToReadableStream` from `react-dom/server` to generate an HTML response, including the current date formatted by `Intl.DateTimeFormat`.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/benchmarks.md#_snippet_4
+
+LANGUAGE: js
+CODE:
+```
+import { renderToReadableStream } from "react-dom/server";
+
+const dt = new Intl.DateTimeFormat();
+
+export default {
+  port: 3000,
+  async fetch(request: Request) {
+    return new Response(
+      await renderToReadableStream(
+        <html>
+          <head>
+            <title>Hello World</title>
+          </head>
+          <body>
+            <h1>Hello from React!</h1>
+            <p>The date is {dt.format(new Date())}</p>
+          </body>
+        </html>,
+      ),
+    );
+  }
+};
+```
+
+----------------------------------------
+
+TITLE: Installing Dependencies with Bun
+DESCRIPTION: This command uses the Bun package manager to install all project dependencies as defined in the `package.json` file, ensuring all required packages are available for the project.
+SOURCE: https://github.com/oven-sh/bun/blob/main/src/cli/init/README2.default.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+bun install
+```
+
+----------------------------------------
+
+TITLE: Writing a String to a Relative Path using Bun.write() in TypeScript
+DESCRIPTION: This snippet shows how to write a string to a file using a relative path with `Bun.write()`. The relative path is resolved against the project root (the nearest directory containing a `package.json` file). The string 'Lorem ipsum' is written to the specified file.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/guides/write-file/basic.md#_snippet_1
+
+LANGUAGE: ts
+CODE:
+```
+const path = "./file.txt";
+await Bun.write(path, "Lorem ipsum");
+```
+
+----------------------------------------
+
+TITLE: Install Bun on macOS and Linux
+DESCRIPTION: This snippet provides multiple ways to install Bun on macOS and Linux operating systems. It covers installation via direct curl download, npm, Homebrew, and Docker. Users should ensure `unzip` is installed for curl method and kernel version is 5.1+.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/installation.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+$ curl -fsSL https://bun.sh/install | bash # for macOS, Linux, and WSL
+```
+
+LANGUAGE: bash
+CODE:
+```
+$ curl -fsSL https://bun.sh/install | bash -s "bun-v$BUN_LATEST_VERSION"
+```
+
+LANGUAGE: bash
+CODE:
+```
+$ npm install -g bun # the last `npm` command you'll ever need
+```
+
+LANGUAGE: bash
+CODE:
+```
+$ brew install oven-sh/bun/bun # for macOS and Linux
+```
+
+LANGUAGE: bash
+CODE:
+```
+$ docker pull oven/bun
+```
+
+LANGUAGE: bash
+CODE:
+```
+$ docker run --rm --init --ulimit memlock=-1:-1 oven/bun
+```
+
+----------------------------------------
+
+TITLE: Adding a Dependency with Bun
+DESCRIPTION: This command adds an npm package (zod) as a dependency to the project using Bun's package manager. By default, it uses the caret (^) range specifier for versioning, allowing for future minor or patch updates.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/guides/install/add.md#_snippet_0
+
+LANGUAGE: sh
+CODE:
+```
+$ bun add zod
+```
+
+----------------------------------------
+
+TITLE: Creating a Basic HTTP Server with Bun (TypeScript)
+DESCRIPTION: This snippet demonstrates how to create a simple HTTP server using `Bun.serve` that responds with 'Bun!' to every request. It listens on port 3000 and uses a `fetch` handler to process incoming requests, showcasing Bun's native server capabilities.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/api/http.md#_snippet_55
+
+LANGUAGE: TypeScript
+CODE:
+```
+Bun.serve({
+  fetch(req: Request) {
+    return new Response("Bun!");
+  },
+  port: 3000,
+});
+```
+
+----------------------------------------
+
+TITLE: Defining Bun Tests and Suites with `test` and `describe`
+DESCRIPTION: This TypeScript snippet demonstrates how to define individual tests using the `test` function and group them into suites using `describe`. It showcases the Jest-like `expect` API for assertions, defining a 'math' suite with 'add' and 'multiply' tests.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/guides/test/run-tests.md#_snippet_3
+
+LANGUAGE: ts
+CODE:
+```
+import { test, expect, describe } from "bun:test";
+
+describe("math", () => {
+  test("add", () => {
+    expect(2 + 2).toEqual(4);
+  });
+
+  test("multiply", () => {
+    expect(2 * 2).toEqual(4);
+  });
+});
+```
+
+----------------------------------------
+
+TITLE: Installing Project Dependencies with Bun (Bash)
+DESCRIPTION: Installs all `dependencies`, `devDependencies`, and `optionalDependencies` for a project using Bun's package manager. It also runs `pre|postinstall` scripts and writes a `bun.lock` file.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/install/index.md#_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+$ bun install
+```
+
+----------------------------------------
+
+TITLE: Exporting Default Server Handler in Bun (TypeScript)
+DESCRIPTION: This snippet demonstrates an alternative way to configure a Bun HTTP server by using a `default` export. Instead of explicitly calling `Bun.serve`, Bun automatically recognizes and uses the exported object as the server configuration, particularly if it contains a `fetch` handler. This syntax also supports hot-reloading out-of-the-box when the `--hot` flag is used.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/api/http.md#_snippet_40
+
+LANGUAGE: TypeScript
+CODE:
+```
+import {type Serve} from "bun";
+
+export default {
+  fetch(req) {
+    return new Response("Bun!");
+  },
+} satisfies Serve;
+```
+
+----------------------------------------
+
+TITLE: Bun Server for HTML Imports and API Routes
+DESCRIPTION: Demonstrates how to set up a Bun server using `Bun.serve()` to handle HTML imports, define API routes, and optionally enable WebSocket support and HMR for development.
+SOURCE: https://github.com/oven-sh/bun/blob/main/src/init/rule.md#_snippet_2
+
+LANGUAGE: TypeScript
+CODE:
+```
+import index from "./index.html"
+
+Bun.serve({
+  routes: {
+    "/": index,
+    "/api/users/:id": {
+      GET: (req) => {
+        return new Response(JSON.stringify({ id: req.params.id }));
+      }
+    }
+  },
+  // optional websocket support
+  websocket: {
+    open: (ws) => {
+      ws.send("Hello, world!");
+    },
+    message: (ws, message) => {
+      ws.send(message);
+    },
+    close: (ws) => {
+      // handle close
+    }
+  },
+  development: {
+    hmr: true,
+    console: true
+  }
+})
+```
+
+----------------------------------------
+
+TITLE: Installing Project Dependencies with Bun (Bash)
+DESCRIPTION: This command installs all `dependencies`, `devDependencies`, and `optionalDependencies` for a project using Bun. It also runs `pre|postinstall` and `pre|postprepare` scripts and writes a `bun.lock` file.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/cli/install.md#_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+$ bun install
+```
+
+----------------------------------------
+
+TITLE: Creating a Basic HTTP Server with Bun.serve (TypeScript)
+DESCRIPTION: This snippet demonstrates how to initialize an HTTP server using `Bun.serve` in TypeScript. It handles various HTTP methods and paths, including serving HTML, redirecting, sending files, responding with JSON, and processing POST requests with JSON or form data. It logs the server's URL upon successful startup.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/guides/http/server.md#_snippet_0
+
+LANGUAGE: TypeScript
+CODE:
+```
+const server = Bun.serve({
+  async fetch(req) {
+    const path = new URL(req.url).pathname;
+
+    // respond with text/html
+    if (path === "/") return new Response("Welcome to Bun!");
+
+    // redirect
+    if (path === "/abc") return Response.redirect("/source", 301);
+
+    // send back a file (in this case, *this* file)
+    if (path === "/source") return new Response(Bun.file(import.meta.path));
+
+    // respond with JSON
+    if (path === "/api") return Response.json({ some: "buns", for: "you" });
+
+    // receive JSON data to a POST request
+    if (req.method === "POST" && path === "/api/post") {
+      const data = await req.json();
+      console.log("Received JSON:", data);
+      return Response.json({ success: true, data });
+    }
+
+    // receive POST data from a form
+    if (req.method === "POST" && path === "/form") {
+      const data = await req.formData();
+      console.log(data.get("someField"));
+      return new Response("Success");
+    }
+
+    // 404s
+    return new Response("Page not found", { status: 404 });
+  }
+});
+
+console.log(`Listening on ${server.url}`);
+```
+
+----------------------------------------
+
+TITLE: Running the Server File (Bash)
+DESCRIPTION: Command to execute the TypeScript server file directly using `bun index.ts`. Includes the expected output indicating the server is listening.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/quickstart.md#_snippet_2
+
+LANGUAGE: bash
+CODE:
+```
+$ bun index.ts
+Listening on http://localhost:3000 ...
+```
+
+----------------------------------------
+
+TITLE: Bun CLI: Script Running, Package Management, Building, and Testing (Bash)
+DESCRIPTION: This snippet illustrates key functionalities of the Bun command-line interface, including running custom scripts, installing npm packages, bundling projects for web browsers, and executing tests. It also shows how to run executable packages using `bunx`, showcasing Bun's comprehensive toolkit for JavaScript/TypeScript development.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/index.md#_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+$ bun run start                 # run the `start` script
+$ bun install <pkg>             # install a package
+$ bun build ./index.tsx         # bundle a project for browsers
+$ bun test                      # run tests
+$ bunx cowsay 'Hello, world!'   # execute a package
+```
+
+----------------------------------------
+
+TITLE: Creating an Express.js Server with Bun (TypeScript)
+DESCRIPTION: This snippet demonstrates how to set up a basic Express.js server that listens on port 8080. It shows Bun's out-of-the-box compatibility with major Node.js HTTP libraries, allowing existing Express applications to run without modification. The server responds with 'Hello World!' for GET requests to the root path.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/ecosystem/express.md#_snippet_0
+
+LANGUAGE: TypeScript
+CODE:
+```
+import express from "express";
+
+const app = express();
+const port = 8080;
+
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
+app.listen(port, () => {
+  console.log(`Listening on port ${port}...`);
+});
+```
+
+----------------------------------------
+
+TITLE: Defining Basic HTTP Route and Starting Elysia Server in TypeScript
+DESCRIPTION: This TypeScript code demonstrates how to define a simple HTTP GET route ('/') that responds with 'Hello Elysia' and starts the server on port 8080 using the Elysia framework. It illustrates the core functionality of setting up a basic web server and logging its operational status.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/guides/ecosystem/elysia.md#_snippet_1
+
+LANGUAGE: typescript
+CODE:
+```
+import { Elysia } from 'elysia'
+
+const app = new Elysia()
+	.get('/', () => 'Hello Elysia')
+	.listen(8080)
+
+console.log(`🦊 Elysia is running at on port ${app.server?.port}...`)
+```
+
+----------------------------------------
+
+TITLE: Implementing a Simple HTTP Server (TypeScript)
+DESCRIPTION: TypeScript code using `Bun.serve` to create an HTTP server listening on port 3000 that responds with "Bun!" to all requests. Includes logging the server address.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/quickstart.md#_snippet_1
+
+LANGUAGE: ts
+CODE:
+```
+const server = Bun.serve({
+  port: 3000,
+  fetch(req) {
+    return new Response("Bun!");
+  },
+});
+
+console.log(`Listening on http://localhost:${server.port} ...`);
+```
+
+----------------------------------------
+
+TITLE: Running All Tests with Bun
+DESCRIPTION: Executes all test files matching Bun's default patterns (*.test.{js|jsx|ts|tsx}, etc.) recursively in the current working directory. This is the basic command to initiate the test runner.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/cli/test.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+$ bun test
+```
+
+----------------------------------------
+
+TITLE: Defining Per-HTTP Method Routes in Bun.serve
+DESCRIPTION: This snippet demonstrates how to define different handlers for specific HTTP methods (GET, POST, PUT, DELETE, PATCH) on the same route path in `Bun.serve`. This allows for clear separation of concerns based on the intended operation for a given resource.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/api/http.md#_snippet_9
+
+LANGUAGE: TypeScript
+CODE:
+```
+Bun.serve({
+  routes: {
+    "/api/posts": {
+      // Different handlers per method
+      GET: () => new Response("List posts"),
+      POST: async req => {
+        const post = await req.json();
+        return Response.json({ id: crypto.randomUUID(), ...post });
+      },
+      PUT: async req => {
+        const updates = await req.json();
+        return Response.json({ updated: true, ...updates });
+      },
+      DELETE: () => new Response(null, { status: 204 })
+    }
+  }
+});
+```
+
+----------------------------------------
+
+TITLE: Hashing a Password with Default Argon2id in Bun (TypeScript)
+DESCRIPTION: Demonstrates basic password hashing using `Bun.password.hash()` with its default Argon2id algorithm. This built-in function requires no external dependencies for secure password hashing.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/guides/util/hash-a-password.md#_snippet_0
+
+LANGUAGE: ts
+CODE:
+```
+const password = "super-secure-pa$$word";
+
+const hash = await Bun.password.hash(password);
+```
+
+----------------------------------------
+
+TITLE: Installing Bun and Running Commands in GitHub Actions (YAML)
+DESCRIPTION: This snippet demonstrates how to use the `setup-bun` GitHub Action to install Bun and then execute various Bun commands like `bun install`, `bun index.ts`, and `bun run build` within a GitHub Actions workflow. It requires the `actions/checkout` action to be used beforehand.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/guides/runtime/cicd.md#_snippet_0
+
+LANGUAGE: YAML
+CODE:
+```
+name: my-workflow
+jobs:
+  my-job:
+    name: my-job
+    runs-on: ubuntu-latest
+    steps:
+      # ...
+      - uses: actions/checkout@v4
++     - uses: oven-sh/setup-bun@v2
+
+      # run any `bun` or `bunx` command
++     - run: bun install
++     - run: bun index.ts
++     - run: bun run build
+```
+
+----------------------------------------
+
+TITLE: Matching Route with URL Parameters using Bun FileSystemRouter
+DESCRIPTION: Illustrates how the `FileSystemRouter` extracts URL parameters from dynamic routes. When matching '/blog/my-cool-post' against a `[slug].tsx` file, the `params` property in the result object contains the extracted slug.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/api/file-system-router.md#_snippet_3
+
+LANGUAGE: TypeScript
+CODE:
+```
+router.match("/blog/my-cool-post");
+
+// =>
+{
+  filePath: "/Users/colinmcd94/Documents/bun/fun/pages/blog/[slug].tsx",
+  kind: "dynamic",
+  name: "/blog/[slug]",
+  pathname: "/blog/my-cool-post",
+  src: "https://mydomain.com/_next/static/pages/blog/[slug].tsx",
+  params: {
+    slug: "my-cool-post"
+  }
+}
+```
+
+----------------------------------------
+
+TITLE: Adding npm Dependencies to a Specific Bun Workspace
+DESCRIPTION: These commands demonstrate how to add an npm dependency to a specific workspace within the monorepo. By `cd`-ing into the workspace directory (`packages/stuff-a`) and running `bun add zod`, Bun detects the workspace context and hoists the dependency appropriately.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/guides/install/workspaces.md#_snippet_4
+
+LANGUAGE: sh
+CODE:
+```
+cd packages/stuff-a\nbun add zod
+```
+
+----------------------------------------
+
+TITLE: Integrating Bun Tests into GitHub Actions Workflow
+DESCRIPTION: Provides a YAML configuration for a GitHub Actions workflow that checks out code, installs Bun using `oven-sh/setup-bun@v2`, installs project dependencies, and then runs `bun test`. This enables automated testing in CI/CD environments.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/cli/test.md#_snippet_5
+
+LANGUAGE: yaml
+CODE:
+```
+jobs:
+  build:
+    name: build-app
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
+      - name: Install dependencies # (assuming your project has dependencies)
+        run: bun install # You can use npm/yarn/pnpm instead if you prefer
+      - name: Run tests
+        run: bun test
+```
+
+----------------------------------------
+
+TITLE: Installing Project Dependencies with Bun
+DESCRIPTION: After initializing the project, these commands navigate into the newly created `my-app` directory and then use `bun install` to download and install all required project dependencies, as instructed by the `create-solid` CLI.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/guides/ecosystem/solidstart.md#_snippet_1
+
+LANGUAGE: sh
+CODE:
+```
+$ cd my-app
+$ bun install
+```
+
+----------------------------------------
+
+TITLE: Managing Dependencies with Bun Install (Bash)
+DESCRIPTION: This snippet demonstrates basic dependency management operations using `bun install`. It covers initializing a project, adding regular and development dependencies, and removing dependencies. `bun install` is presented as a direct, faster replacement for `npm install`.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/guides/install/from-npm-install-to-bun-install.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+# It only takes one command to migrate
+$ bun i
+
+# To add dependencies:
+$ bun i @types/bun
+
+# To add devDependencies:
+$ bun i -d @types/bun
+
+# To remove a dependency:
+$ bun rm @types/bun
+```
+
+----------------------------------------
+
+TITLE: Configuring Bun Package Cache Behavior (bunfig.toml)
+DESCRIPTION: This TOML snippet demonstrates how to configure Bun's package cache behavior within the `bunfig.toml` file. It allows specifying the cache directory, disabling the global cache, and controlling manifest resolution to always fetch the latest versions from the registry. These settings influence how Bun stores and retrieves packages, optimizing installation performance and disk usage.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/install/cache.md#_snippet_0
+
+LANGUAGE: toml
+CODE:
+```
+[install.cache]
+# the directory to use for the cache
+dir = "~/.bun/install/cache"
+
+# when true, don't load from the global cache.
+# Bun may still write to node_modules/.cache
+disable = false
+
+# when true, always resolve the latest versions from the registry
+disableManifest = false
+```
+
+----------------------------------------
+
+TITLE: Basic Stric Router with Bun (TypeScript)
+DESCRIPTION: Initializes a Stric Router instance and exports it as the default fetch handler for Bun. It defines a GET route for the root path ('/') that returns a simple 'Hi' response.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/ecosystem/stric.md#_snippet_0
+
+LANGUAGE: ts
+CODE:
+```
+import { Router } from '@stricjs/router';
+
+// Export the fetch handler and serve with Bun
+export default new Router()
+  // Return 'Hi' on every request
+  .get('/', () => new Response('Hi'));
+```
+
+----------------------------------------
+
+TITLE: Accessing Strongly Typed Environment Variables (TypeScript)
+DESCRIPTION: This TypeScript snippet demonstrates accessing an environment variable (`AWESOME`) after its type has been explicitly defined using interface merging. This ensures that TypeScript recognizes `AWESOME` as a `string`, providing type safety and autocompletion.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/runtime/env.md#_snippet_21
+
+LANGUAGE: ts
+CODE:
+```
+process.env.AWESOME; // => string
+```
+
+----------------------------------------
+
+TITLE: Implementing Type-Safe Route Parameters in Bun
+DESCRIPTION: This snippet demonstrates how Bun's `Bun.serve` automatically infers the types of route parameters when string literals are used for route paths, enabling type-safe access to `req.params`. It also shows how to explicitly type `BunRequest` for complex scenarios, improving developer experience with autocompletion.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/api/http.md#_snippet_4
+
+LANGUAGE: TypeScript
+CODE:
+```
+import type { BunRequest } from "bun";
+
+Bun.serve({
+  routes: {
+    // TypeScript knows the shape of params when passed as a string literal
+    "/orgs/:orgId/repos/:repoId": req => {
+      const { orgId, repoId } = req.params;
+      return Response.json({ orgId, repoId });
+    },
+
+    "/orgs/:orgId/repos/:repoId/settings": (
+      // optional: you can explicitly pass a type to BunRequest:
+      req: BunRequest<"/orgs/:orgId/repos/:repoId/settings">
+    ) => {
+      const { orgId, repoId } = req.params;
+      return Response.json({ orgId, repoId });
+    }
+  }
+});
+```
+
+----------------------------------------
+
+TITLE: Opening a Named SQLite3 Database File
+DESCRIPTION: Illustrates how to create or open a persistent SQLite3 database file by providing a filename to the `Database` constructor. If the file does not exist, it will be created.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/api/sqlite.md#_snippet_1
+
+LANGUAGE: TypeScript
+CODE:
+```
+import { Database } from "bun:sqlite";
+
+const db = new Database("mydb.sqlite");
+```
+
+----------------------------------------
+
+TITLE: HTML Structure for Bun SPA with Client-Side Routing
+DESCRIPTION: This HTML snippet serves as the entry point for a Single Page Application (SPA) using Bun. When passed to Bun, it acts as a fallback route for all paths, allowing client-side routers (e.g., React Router) to manage navigation within the single HTML file. It includes a script tag for the main application logic, typically written in TypeScript or JSX.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/bundler/html.md#_snippet_1
+
+LANGUAGE: HTML
+CODE:
+```
+<!doctype html>\n<html>\n  <head>\n    <title>My SPA</title>\n    <script src="./app.tsx" type="module"></script>\n  </head>\n  <body>\n    <div id="root"></div>\n  </body>\n</html>
+```
+
+----------------------------------------
+
+TITLE: Defining a Simple Express HTTP Server in TypeScript
+DESCRIPTION: This TypeScript code defines a basic Express HTTP server. It initializes an Express application, sets the listening port from environment variables or defaults to 3001, and defines a GET route for the root path ('/') that responds with 'Hello World!'. The server then starts listening on the specified port.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/guides/ecosystem/render.md#_snippet_2
+
+LANGUAGE: ts
+CODE:
+```
+import express from "express";
+
+const app = express();
+const port = process.env.PORT || 3001;
+
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
+app.listen(port, () => {
+  console.log(`Listening on port ${port}...`);
+});
+```
+
+----------------------------------------
+
+TITLE: Executing JavaScript and TypeScript Files with Bun
+DESCRIPTION: This snippet demonstrates how to execute various JavaScript and TypeScript file types (.js, .jsx, .ts, .tsx) directly using the Bun runtime. Bun's native transpiler handles the on-the-fly transformation of these files to vanilla JavaScript before execution, eliminating the need for separate build steps for type removal.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/runtime/index.md#_snippet_0
+
+LANGUAGE: Bash
+CODE:
+```
+$ bun index.js
+$ bun index.jsx
+$ bun index.ts
+$ bun index.tsx
+```
+
+----------------------------------------
+
+TITLE: Serving Static Responses with Bun.serve
+DESCRIPTION: This snippet illustrates how to define static `Response` objects directly within `Bun.serve` routes for optimized, zero-allocation dispatch. It covers examples like health checks, custom headers, redirects, and JSON API responses, highlighting performance benefits for fixed content.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/api/http.md#_snippet_5
+
+LANGUAGE: TypeScript
+CODE:
+```
+Bun.serve({
+  routes: {
+    // Health checks
+    "/health": new Response("OK"),
+    "/ready": new Response("Ready", {
+      headers: {
+        // Pass custom headers
+        "X-Ready": "1"
+      }
+    }),
+
+    // Redirects
+    "/blog": Response.redirect("https://bun.sh/blog"),
+
+    // API responses
+    "/api/config": Response.json({
+      version: "1.0.0",
+      env: "production"
+    })
+  }
+});
+```
+
+----------------------------------------
+
+TITLE: Reading File Contents as String with Bun
+DESCRIPTION: This snippet demonstrates how to read the contents of a file as a string using Bun's `Bun.file()` function. It first creates a `BunFile` instance from a given path and then uses the `.text()` method to asynchronously retrieve the file's content as a string. The `BunFile` instance extends `Blob`, allowing lazy file reading.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/guides/read-file/string.md#_snippet_0
+
+LANGUAGE: TypeScript
+CODE:
+```
+const path = "/path/to/file.txt";
+const file = Bun.file(path);
+
+const text = await file.text();
+// string
+```
+
+----------------------------------------
+
+TITLE: Importing JSON and TOML Files in Bun
+DESCRIPTION: This TypeScript snippet illustrates how Bun allows direct import of `.json` and `.toml` files. The contents of these files are automatically parsed and loaded as plain JavaScript objects, simplifying configuration and data loading within Bun applications.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/runtime/index.md#_snippet_1
+
+LANGUAGE: TypeScript
+CODE:
+```
+import pkg from "./package.json";
+import bunfig from "./bunfig.toml";
+```
+
+----------------------------------------
+
+TITLE: Creating a Static File Server with Bun.serve() in TypeScript
+DESCRIPTION: This snippet demonstrates how to build a simple static file server using `Bun.serve()`. It shows how to extract the requested file path from the URL, read the corresponding file using `Bun.file()`, and serve it directly as an HTTP `Response`.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/guides/http/stream-file.md#_snippet_2
+
+LANGUAGE: TypeScript
+CODE:
+```
+// static file server
+Bun.serve({
+  async fetch(req) {
+    const path = new URL(req.url).pathname;
+    const file = Bun.file(path);
+    return new Response(file);
+  }
+});
+```
+
+----------------------------------------
+
+TITLE: Reading Cookies/Headers for WebSocket Context in Bun (TypeScript)
+DESCRIPTION: This example illustrates how to use incoming request headers and cookies to populate more complex contextual data for a WebSocket. It defines a `WebSocketData` type and shows how to parse cookies and fetch user information to store `createdAt`, `token`, and `userId`, which can then be used in WebSocket message handlers, for instance, to save messages to a database.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/guides/websocket/context.md#_snippet_1
+
+LANGUAGE: TypeScript
+CODE:
+```
+type WebSocketData = {
+  createdAt: number;
+  token: string;
+  userId: string;
+};
+
+// TypeScript: specify the type of `data`
+Bun.serve<WebSocketData>({
+  async fetch(req, server) {
+    // use a library to parse cookies
+    const cookies = parseCookies(req.headers.get("Cookie"));
+    const token = cookies["X-Token"];
+    const user = await getUserFromToken(token);
+
+    const upgraded = server.upgrade(req, {
+      data: {
+        createdAt: Date.now(),
+        token: cookies["X-Token"],
+        userId: user.id,
+      },
+    });
+
+    if (upgraded) return undefined;
+  },
+  websocket: {
+    async message(ws, message) {
+      // save the message to a database
+      await saveMessageToDatabase({
+        message: String(message),
+        userId: ws.data.userId,
+      });
+    },
+  },
+});
+```
+
+----------------------------------------
+
+TITLE: Configure Bun PATH on Linux and macOS
+DESCRIPTION: This snippet guides users on manually adding the Bun installation directory to the system's PATH environment variable on Linux and macOS. It includes instructions for Zsh, Bash, and Fish shells, requiring a new terminal session for changes to take effect.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/installation.md#_snippet_4
+
+LANGUAGE: sh
+CODE:
+```
+$ echo $SHELL
+/bin/zsh # or /bin/bash or /bin/fish
+```
+
+LANGUAGE: bash
+CODE:
+```
+# add to ~/.zshrc
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+```
+
+LANGUAGE: bash
+CODE:
+```
+# add to ~/.bashrc
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+```
+
+LANGUAGE: sh
+CODE:
+```
+# add to ~/.config/fish/config.fish
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+```
+
+----------------------------------------
+
+TITLE: Installing Packages (Bash)
+DESCRIPTION: Commands to install the `figlet` package and its TypeScript type declarations (`@types/figlet`) using `bun add`.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/quickstart.md#_snippet_6
+
+LANGUAGE: bash
+CODE:
+```
+$ bun add figlet
+$ bun add -d @types/figlet # TypeScript users only
+```
+
+----------------------------------------
+
+TITLE: Sending Basic HTTP GET Request with Bun Fetch (TypeScript)
+DESCRIPTION: This snippet demonstrates how to send a basic HTTP GET request using Bun's `fetch` API. It retrieves the response, logs its status code, and then reads the response body as text. The `fetch` function returns a Promise that resolves to a `Response` object.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/api/fetch.md#_snippet_0
+
+LANGUAGE: TypeScript
+CODE:
+```
+const response = await fetch("http://example.com");
+
+console.log(response.status); // => 200
+
+const text = await response.text(); // or response.json(), response.formData(), etc.
+```
+
+----------------------------------------
+
+TITLE: Running Package.json Scripts and Binaries with Bun (Shell)
+DESCRIPTION: This snippet illustrates how Bun can execute `package.json` scripts, executables from `node_modules/.bin`, and JavaScript/TypeScript files. It highlights Bun's unified command structure (`bun <script>`, `bun <bin>`, `bun <file>`) as a faster alternative to `npm run`, `npm exec`, `node`, and `npx`.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/guides/install/from-npm-install-to-bun-install.md#_snippet_1
+
+LANGUAGE: sh
+CODE:
+```
+# Run a package.json script:
+$ bun my-script
+$ bun run my-script
+
+# Run an executable in node_modules/.bin:
+$ bun my-executable # such as tsc, esbuild, etc.
+$ bun run my-executable
+
+# Run a JavaScript/TypeScript file:
+$ bun ./index.ts
+```
+
+----------------------------------------
+
+TITLE: Setting Custom Headers with Object (TypeScript)
+DESCRIPTION: This snippet demonstrates how to add custom HTTP headers to a `fetch` request by providing an object to the `headers` property. This allows for sending additional metadata or authentication tokens with the request.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/api/fetch.md#_snippet_5
+
+LANGUAGE: TypeScript
+CODE:
+```
+const response = await fetch("http://example.com", {
+  headers: {
+    "X-Custom-Header": "value",
+  },
+});
+```
+
+----------------------------------------
+
+TITLE: Install Specific Bun Version via Script
+DESCRIPTION: This snippet demonstrates how to install a specific version of Bun on different operating systems using their respective command-line tools. It allows targeting a precise release or the latest available version by passing a version tag or number to the install script.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/installation.md#_snippet_7
+
+LANGUAGE: Shell
+CODE:
+```
+$ curl -fsSL https://bun.sh/install | bash -s "bun-v$BUN_LATEST_VERSION"
+```
+
+LANGUAGE: PowerShell
+CODE:
+```
+# PowerShell:
+$ iex "& {$(irm https://bun.sh/install.ps1)} -Version $BUN_LATEST_VERSION"
+```
+
+----------------------------------------
+
+TITLE: Creating a Basic Bun HTTP Server (TypeScript)
+DESCRIPTION: This snippet initializes a Bun HTTP server listening on port 4000. It serves an 'index.html' file when the root path ('/') is requested, setting the appropriate 'Content-Type' header. All other paths return a 'Not Found' response.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/guides/http/file-uploads.md#_snippet_0
+
+LANGUAGE: TypeScript
+CODE:
+```
+const server = Bun.serve({
+  port: 4000,
+  async fetch(req) {
+    const url = new URL(req.url);
+
+    // return index.html for root path
+    if (url.pathname === "/")
+      return new Response(Bun.file("index.html"), {
+        headers: {
+          "Content-Type": "text/html",
+        },
+      });
+
+    return new Response("Not Found", { status: 404 });
+  },
+});
+
+console.log(`Listening on http://localhost:${server.port}`);
+```
+
+----------------------------------------
+
+TITLE: Querying Data with Bun SQLite3
+DESCRIPTION: Demonstrates importing the `Database` class from `bun:sqlite`, opening an in-memory database, preparing a simple `SELECT` query, and retrieving the result using `.get()`.
+SOURCE: https://github.com/oven-sh/bun/blob/main/docs/api/sqlite.md#_snippet_0
+
+LANGUAGE: TypeScript
+CODE:
+```
+import { Database } from "bun:sqlite";
+
+const db = new Database(":memory:");
+const query = db.query("select 'Hello world' as message;");
+query.get(); // => { message: "Hello world" }
+```
