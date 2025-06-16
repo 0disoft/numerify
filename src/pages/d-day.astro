@@ -41,5 +41,45 @@ import Layout from "../layouts/Layout.astro";
 </Layout>
 
 <script>
-  // 이 부분은 다음 단계에서 작성합니다.
+  const ddayInput = document.getElementById("dday-date") as HTMLInputElement;
+  const calculateBtn = document.getElementById("calculate-dday-btn");
+  const resultDiv = document.getElementById("dday-result");
+  const ddayValueSpan = document.getElementById("dday-value");
+
+  if (calculateBtn) {
+    calculateBtn.addEventListener("click", () => {
+      if (!ddayInput || !ddayInput.value) {
+        alert("날짜를 선택해주세요.");
+        return;
+      }
+
+      // 사용자가 선택한 날짜 (시간을 자정으로 설정)
+      const targetDate = new Date(ddayInput.value);
+      targetDate.setHours(0, 0, 0, 0);
+
+      // 오늘 날짜 (시간을 자정으로 설정)
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // 밀리초(ms) 단위의 시간 차이를 일(day) 단위로 변환
+      const diffTime = targetDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      let resultText = "";
+      if (diffDays === 0) {
+        resultText = "D-Day!";
+      } else if (diffDays > 0) {
+        resultText = `D-${diffDays}`;
+      } else {
+        resultText = `D+${Math.abs(diffDays)}`;
+      }
+
+      if (ddayValueSpan) {
+        ddayValueSpan.textContent = resultText;
+      }
+      if (resultDiv) {
+        resultDiv.classList.remove("hidden");
+      }
+    });
+  }
 </script>
