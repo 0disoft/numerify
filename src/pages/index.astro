@@ -2,12 +2,37 @@
 import Layout from "../layouts/Layout.astro";
 ---
 
-<Layout title="Numerify, 모든 계산을 한 곳에서!">
-  <div>
-    <h1>환영합니다!</h1>
-    <p>
-      이곳은 다양한 계산 기능을 제공하는 웹사이트입니다. 필요한 계산기를
-      선택하여 사용해 보세요.
-    </p>
+<Layout title="Numerify: 각종 편의성 계산기">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4
+    gap-4 py-8">
+    {
+      /* [3.3] 단계에서 이 자리에 
+      계산기 카드들이 동적으로 렌더링될 예정입니다.
+    */
+    }
+    <div
+      class="border rounded-lg p-4 h-32 bg-white
+      shadow-sm flex items-center justify-center"
+    >
+      (카드 예시 1)
+    </div>
+    <div
+      class="border rounded-lg p-4 h-32 bg-white
+      shadow-sm flex items-center justify-center"
+    >
+      (카드 예시 2)
+    </div>
+    <div
+      class="border rounded-lg p-4 h-32 bg-white
+      shadow-sm flex items-center justify-center"
+    >
+      (카드 예시 3)
+    </div>
+    <div
+      class="border rounded-lg p-4 h-32 bg-white
+      shadow-sm flex items-center justify-center"
+    >
+      (카드 예시 4)
+    </div>
   </div>
 </Layout>

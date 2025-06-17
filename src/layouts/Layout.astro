@@ -1,16 +1,13 @@
 ---
+// src/layouts/Layout.astro
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
+import "../styles/global.css"; // ❗️ 이 줄을 추가합니다.
 
-import "../styles/global.css";
-
-// TypeScript를 사용하여 Props 타입을 정의합니다.
-// 모든 페이지에서 페이지 제목(title)을 받을 수 있도록 설정합니다.
 interface Props {
   title: string;
 }
 
-// Astro.props에서 title을 가져옵니다.
 const { title } = Astro.props;
 ---
 
@@ -18,60 +15,23 @@ const { title } = Astro.props;
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="각종 유용한 계산기 모음" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content="각종 편의성 계산기 웹사이트" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
-  <body>
+  <body class="flex flex-col min-h-screen bg-gray-50">
     <Header />
-    <main>
+    <main class="flex-grow container mx-auto p-4">
       <slot />
     </main>
     <Footer />
   </body>
 </html>
+
 <style is:global>
-  /* 전역적으로 적용될 기본 스타일을 설정합니다. */
-  :root {
-    --accent: 136, 58, 234;
-    --accent-light: 224, 204, 250;
-    --accent-dark: 49, 10, 101;
-    --accent-gradient: linear-gradient(
-      45deg,
-      rgb(var(--accent)),
-      rgb(var(--accent-light)) 30%,
-      white 60%
-    );
-  }
-  html {
-    font-family: system-ui, sans-serif;
-    background: #f6f6f6;
-  }
   body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    margin: 0;
-  }
-  main {
-    flex-grow: 1;
-    padding: 1.5rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
-    box-sizing: border-box;
-  }
-  code {
-    font-family:
-      Menlo,
-      Monaco,
-      Lucida Console,
-      Liberation Mono,
-      DejaVu Sans Mono,
-      Bitstream Vera Sans Mono,
-      Courier New,
-      monospace;
+    font-family: "Pretendard", sans-serif;
   }
 </style>
