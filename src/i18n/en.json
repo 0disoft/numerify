@@ -1,0 +1,25 @@
+{
+  "page_titles": {
+    "home": "Numerify, the elegant web calculator"
+  },
+  "header": {
+    "title": "Numerify"
+  },
+  "footer": {
+    "copyright": "Numerify. All rights reserved."
+  },
+  "cards": {
+    "bmi": {
+      "title": "BMI Calculator",
+      "description": "Calculate Body Mass Index."
+    },
+    "d_day": {
+      "title": "D-Day Calculator",
+      "description": "Calculate remaining days to a specific date."
+    },
+    "loan": {
+      "title": "Loan Interest Calculator",
+      "description": "Calculate loan payments."
+    }
+  }
+}

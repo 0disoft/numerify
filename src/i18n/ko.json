@@ -1,0 +1,25 @@
+{
+  "page_titles": {
+    "home": "Numerify, 우아한 웹 계산기"
+  },
+  "header": {
+    "title": "Numerify"
+  },
+  "footer": {
+    "copyright": "Numerify. All rights reserved."
+  },
+  "cards": {
+    "bmi": {
+      "title": "BMI 계산기",
+      "description": "체질량 지수를 계산합니다."
+    },
+    "d_day": {
+      "title": "D-Day 계산기",
+      "description": "특정일까지 남은 날짜를 계산합니다."
+    },
+    "loan": {
+      "title": "대출 이자 계산기",
+      "description": "대출 원리금을 계산합니다."
+    }
+  }
+}

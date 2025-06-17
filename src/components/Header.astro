@@ -1,5 +1,6 @@
 ---
 // src/components/Header.astro
+import LanguageSelector from "./LanguageSelector.tsx";
 ---
 
 <header class="flex justify-between items-center p-4
@@ -7,7 +8,7 @@
   <a href="/" class="text-2xl font-bold text-[#BF211E]"> Numerify </a>
 
   <div class="flex items-center gap-4">
-    <div id="language-selector-container"></div>
+    <LanguageSelector client:load />
 
     <div id="theme-toggle-container"></div>
   </div>

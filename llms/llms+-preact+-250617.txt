@@ -1,0 +1,1388 @@
+TITLE: Handling Text Input in Preact (Classes & Hooks)
+DESCRIPTION: This snippet demonstrates how to create a simple text input field in Preact. It shows how to use the onInput event to capture user input per-keystroke and update a state value, which is then rendered dynamically. Examples are provided for both Class Components and Functional Components using the useState hook.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/guide/v10/forms.md#_snippet_0
+
+LANGUAGE: jsx
+CODE:
+```
+import { render, Component } from "preact";
+
+class BasicInput extends Component {
+  state = { name: '' };
+
+  onInput = e => this.setState({ name: e.currentTarget.value });
+
+  render(_, { name }) {
+    return (
+      <div class="form-example">
+        <label>
+          Name:{' '}
+          <input onInput={this.onInput} />
+        </label>
+        <p>Hello {name}</p>
+      </div>
+    );
+  }
+}
+render(<BasicInput />, document.getElementById("app"));
+```
+
+LANGUAGE: jsx
+CODE:
+```
+import { render } from "preact";
+import { useState } from "preact/hooks";
+
+function BasicInput() {
+  const [name, setName] = useState('');
+
+  return (
+    <div class="form-example">
+      <label>
+        Name:{' '}
+        <input onInput={(e) => setName(e.currentTarget.value)} />
+      </label>
+      <p>Hello {name}</p>
+    </div>
+  );
+}
+render(<BasicInput />, document.getElementById("app"));
+```
+
+----------------------------------------
+
+TITLE: Preact Signals Basic Usage Example
+DESCRIPTION: This example demonstrates the basic usage of Preact Signals, showing how to define a signal and a computed signal, and how to use them within a functional component. The component updates automatically when the signal's value changes.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/blog/introducing-signals.md#_snippet_0
+
+LANGUAGE: jsx
+CODE:
+```
+import { render } from "preact";
+import { signal, computed } from "@preact/signals";
+ 
+const count = signal(0);
+const double = computed(() => count.value * 2);
+ 
+function Counter() {
+  return (
+    <button onClick={() => count.value++}>
+      {count} x 2 = {double}
+    </button>
+  );
+}
+render(<Counter />, document.getElementById("app"));
+```
+
+----------------------------------------
+
+TITLE: Creating a Functional Preact Component
+DESCRIPTION: Demonstrates how to define a simple functional component in Preact that receives props and renders JSX. Functional components are plain JavaScript functions that must start with an uppercase letter.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/guide/v10/components.md#_snippet_0
+
+LANGUAGE: jsx
+CODE:
+```
+import { render } from 'preact';
+
+function MyComponent(props) {
+  return <div>My name is {props.name}.</div>;
+}
+
+// Usage
+const App = <MyComponent name="John Doe" />;
+
+// Renders: <div>My name is John Doe.</div>
+render(App, document.body);
+```
+
+----------------------------------------
+
+TITLE: Create and Use Custom Preact Hook for Reusable Counter Logic
+DESCRIPTION: Illustrates how to create a custom Preact Hook (`useCounter`) to encapsulate counter logic, demonstrating its independent reuse across multiple components (`CounterA`, `CounterB`) with isolated state.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/guide/v10/hooks.md#_snippet_2
+
+LANGUAGE: jsx
+CODE:
+```
+function useCounter() {
+  const [value, setValue] = useState(0);
+  const increment = useCallback(() => {
+    setValue(value + 1);
+  }, [value]);
+  return { value, increment };
+}
+
+// First counter
+function CounterA() {
+  const { value, increment } = useCounter();
+  return (
+    <div>
+      <p>Counter A: {value}</p>
+      <button onClick={increment}>Increment</button>
+    </div>
+  );
+}
+
+// Second counter which renders a different output.
+function CounterB() {
+  const { value, increment } = useCounter();
+  return (
+    <div>
+      <h1>Counter B: {value}</h1>
+      <p>I'm a nice counter</p>
+      <button onClick={increment}>Increment</button>
+    </div>
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Preact Counter Component with useState Hook
+DESCRIPTION: These Preact JSX code examples illustrate the development of a simple counter component. The initial version sets up the basic structure, while the final version demonstrates how to use the `useState` hook to manage and increment a numerical `count` state on button clicks, and display its value.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/tutorial/04-state.md#_snippet_4
+
+LANGUAGE: jsx
+CODE:
+```
+import { render } from 'preact';
+import { useState } from 'preact/hooks';
+
+function MyButton(props) {
+  return <button style={props.style} onClick={props.onClick}>{props.children}</button>
+}
+
+function App() {
+  const clicked = () => {
+    // increment count by 1 here
+  }
+
+  return (
+    <div>
+      <p class="count">Count:</p>
+      <MyButton style={{ color: 'purple' }} onClick={clicked}>Click me</MyButton>
+    </div>
+  )
+}
+
+render(<App />, document.getElementById("app"));
+```
+
+LANGUAGE: jsx
+CODE:
+```
+import { render } from 'preact';
+import { useState } from 'preact/hooks';
+
+function MyButton(props) {
+  return <button style={props.style} onClick={props.onClick}>{props.children}</button>
+}
+
+function App() {
+  const [count, setCount] = useState(0)
+
+  const clicked = () => {
+    setCount(count + 1)
+  }
+
+  return (
+    <div>
+      <p class="count">Count: {count}</p>
+      <MyButton style={{ color: 'purple' }} onClick={clicked}>Click me</MyButton>
+    </div>
+  )
+}
+
+render(<App />, document.getElementById("app"));
+```
+
+----------------------------------------
+
+TITLE: Preact Counter Component Example
+DESCRIPTION: A simple Preact functional component named 'Counter' that displays an initial count and provides a button to increment it, demonstrating basic state management with 'useState' hook.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/guide/v10/unit-testing-with-enzyme.md#_snippet_2
+
+LANGUAGE: jsx
+CODE:
+```
+import { h } from 'preact';
+import { useState } from 'preact/hooks';
+
+export default function Counter({ initialCount }) {
+  const [count, setCount] = useState(initialCount);
+  const increment = () => setCount(count + 1);
+
+  return (
+    <div>
+      Current value: {count}
+      <button onClick={increment}>Increment</button>
+    </div>
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Rendering a Preact App to the DOM
+DESCRIPTION: Illustrates how to use the `render()` function from 'preact' to inject a Preact application's virtual DOM into a specified HTML DOM element. This is the final step to make your Preact application visible and interactive in the browser.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/guide/v10/tutorial.md#_snippet_1
+
+LANGUAGE: jsx
+CODE:
+```
+import { render } from 'preact';
+
+const App = <h1>Hello World!</h1>;
+
+// Inject our app into the DOM
+render(App, document.getElementById('app'));
+```
+
+----------------------------------------
+
+TITLE: Implement Fragments in Preact X
+DESCRIPTION: Fragments are a major new feature in Preact X that allow components to return multiple nodes from `render` without an extra wrapping DOM element. This snippet demonstrates how to use the shorthand `<>` syntax for fragments.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/guide/v10/whats-new.md#_snippet_0
+
+LANGUAGE: jsx
+CODE:
+```
+// --repl
+function Foo() {
+  return (
+    <>
+      <div>A</div>
+      <div>B</div>
+    </>
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Preact Signals Counter Component
+DESCRIPTION: This snippet demonstrates a basic counter component in Preact using the `@preact/signals` library for reactive state management. It shows how to define a signal, update its value, and display it in a UI, with buttons for incrementing and decrementing the count. The component is then rendered into a DOM element.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/src/components/controllers/repl/examples/counters/counter-signals.txt#_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+import { render } from 'preact';
+import { signal } from '@preact/signals';
+
+const count = signal(0);
+
+function Counter() {
+	return (
+		<div class="counter-container">
+			<button onClick={() => count.value++}>Increment</button>
+			<input readonly value={count} />
+			<button onClick={() => count.value--}>Decrement</button>
+		</div>
+	);
+}
+
+render(<Counter />, document.getElementById('app'));
+```
+
+----------------------------------------
+
+TITLE: Automatic Component Re-rendering with Signals in Preact JSX
+DESCRIPTION: Illustrates how accessing a signal's `.value` property within a Preact component automatically triggers a re-render when the signal's value changes. Shows a `Counter` component that displays and increments a signal, demonstrating reactive updates.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/guide/v10/signals.md#_snippet_1
+
+LANGUAGE: jsx
+CODE:
+```
+import { render } from "preact";
+import { signal } from "@preact/signals";
+
+// Create a signal that can be subscribed to:
+const count = signal(0);
+
+function Counter() {
+  // Accessing .value in a component automatically re-renders when it changes:
+  const value = count.value;
+
+  const increment = () => {
+    // A signal is updated by assigning to the `.value` property:
+    count.value++;
+  }
+
+  return (
+    <div>
+      <p>Count: {value}</p>
+      <button onClick={increment}>click me</button>
+    </div>
+  );
+}
+render(<Counter />, document.getElementById("app"));
+```
+
+----------------------------------------
+
+TITLE: Define a Simple Preact Component
+DESCRIPTION: Illustrates how to define a basic Preact component that returns a Virtual DOM tree describing an HTML button element.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/tutorial/03-components.md#_snippet_0
+
+LANGUAGE: jsx
+CODE:
+```
+function MyButton(props) {
+  return <button class="my-button">{props.text}</button>
+}
+```
+
+----------------------------------------
+
+TITLE: Create a simple counter component in Preact
+DESCRIPTION: This snippet demonstrates how to create a basic counter component in Preact using `useState` for state management. It displays the current count and provides buttons to increment and decrement the value.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/index.md#_snippet_0
+
+LANGUAGE: jsx
+CODE:
+```
+function Counter() {
+  const [value, setValue] = useState(0);
+
+  return (
+    <>
+      <div>Counter: {value}</div>
+      <button onClick={() => setValue(value + 1)}>Increment</button>
+      <button onClick={() => setValue(value - 1)}>Decrement</button>
+    </>
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Handling Checkbox and Radio Button Input in Preact (Classes & Hooks)
+DESCRIPTION: This snippet illustrates how to manage checkbox and radio button states in Preact. It demonstrates toggling a boolean state for a checkbox and updating a string state for radio buttons, with radio buttons being conditionally enabled based on the checkbox state. Examples are provided for both Class Components and Functional Components using the useState hook.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/guide/v10/forms.md#_snippet_1
+
+LANGUAGE: jsx
+CODE:
+```
+import { render, Component } from "preact";
+
+class BasicRadioButton extends Component {
+  state = {
+    allowContact: false,
+    contactMethod: ''
+  };
+
+  toggleContact = () => this.setState({ allowContact: !this.state.allowContact });
+  setRadioValue = e => this.setState({ contactMethod: e.currentTarget.value });
+
+  render(_, { allowContact }) {
+    return (
+      <div class="form-example">
+        <label>
+          Allow contact:{' '}
+          <input type="checkbox" onClick={this.toggleContact} />
+        </label>
+        <label>
+          Phone:{' '}
+          <input type="radio" name="contact" value="phone" onClick={this.setRadioValue} disabled={!allowContact} />
+        </label>
+        <label>
+          Email:{' '}
+          <input type="radio" name="contact" value="email" onClick={this.setRadioValue} disabled={!allowContact} />
+        </label>
+        <label>
+          Mail:{' '}
+          <input type="radio" name="contact" value="mail" onClick={this.setRadioValue} disabled={!allowContact} />
+        </label>
+        <p>
+          You {allowContact ? 'have allowed' : 'have not allowed'} contact {allowContact && ` via ${this.state.contactMethod}`}
+        </p>
+      </div>
+    );
+  }
+}
+render(<BasicRadioButton />, document.getElementById("app"));
+```
+
+LANGUAGE: jsx
+CODE:
+```
+import { render } from "preact";
+import { useState } from "preact/hooks";
+
+function BasicRadioButton() {
+  const [allowContact, setAllowContact] = useState(false);
+  const [contactMethod, setContactMethod] = useState('');
+
+  const toggleContact = () => setAllowContact(!allowContact);
+  const setRadioValue = (e) => setContactMethod(e.currentTarget.value);
+
+  return (
+    <div class="form-example">
+      <label>
+        Allow contact:{' '}
+        <input type="checkbox" onClick={toggleContact} />
+      </label>
+      <label>
+        Phone:{' '}
+        <input type="radio" name="contact" value="phone" onClick={setRadioValue} disabled={!allowContact} />
+      </label>
+      <label>
+        Email:{' '}
+        <input type="radio" name="contact" value="email" onClick={setRadioValue} disabled={!allowContact} />
+      </label>
+      <label>
+        Mail:{' '}
+        <input type="radio" name="contact" value="mail" onClick={setRadioValue} disabled={!allowContact} />
+      </label>
+      <p>
+        You {allowContact ? 'have allowed' : 'have not allowed'} contact {allowContact && ` via ${contactMethod}`}
+      </p>
+    </div>
+  );
+}
+render(<BasicRadioButton />, document.getElementById("app"));
+```
+
+----------------------------------------
+
+TITLE: Manage Component State with useState Hook in Preact
+DESCRIPTION: The `useState` hook allows functional components to manage local state. It accepts an initial state value and returns an array containing the current state and a setter function. The setter function can accept a new value or a callback, and triggers a re-render if the state changes.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/guide/v10/hooks.md#_snippet_4
+
+LANGUAGE: jsx
+CODE:
+```
+import { render } from 'preact';
+import { useState } from 'preact/hooks';
+
+const Counter = () => {
+  const [count, setCount] = useState(0);
+  const increment = () => setCount(count + 1);
+  // You can also pass a callback to the setter
+  const decrement = () => setCount((currentCount) => currentCount - 1);
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={increment}>Increment</button>
+      <button onClick={decrement}>Decrement</button>
+    </div>
+  )
+}
+render(<Counter />, document.getElementById("app"));
+```
+
+----------------------------------------
+
+TITLE: Preact Context for Authentication State Management
+DESCRIPTION: A more practical use case for Context is storing an application's authentication state (whether a user is logged in). This example creates an AuthContext to hold an object with a user property for the logged-in user and a setUser method to modify that state, demonstrating how to manage global authentication status.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/zh/tutorial/06-context.md#_snippet_2
+
+LANGUAGE: jsx
+CODE:
+```
+import { createContext } from 'preact'
+import { useState, useMemo, useContext } from 'preact/hooks'
+
+const AuthContext = createContext()
+
+export default function App() {
+  const [user, setUser] = useState(null)
+
+  const auth = useMemo(() => {
+    return { user, setUser }
+  }, [user])
+
+  return (
+    <AuthContext.Provider value={auth}>
+      <div class="app">
+        {auth.user && <p>Welcome {auth.user.name}!</p>}
+        <Login />
+      </div>
+    </AuthContext.Provider>
+  )
+}
+
+function Login() {
+  const { user, setUser } = useContext(AuthContext)
+
+  if (user) return (
+    <div class="logged-in">
+      Logged in as {user.name}.
+      <button onClick={() => setUser(null)}>
+        Log Out
+      </button>
+    </div>
+  )
+
+  return (
+    <div class="logged-out">
+      <button onClick={() => setUser({ name: 'Bob' })}>
+        Log In
+      </button>
+    </div>
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Preact ToDo Application Example
+DESCRIPTION: This Preact application demonstrates a simple ToDo list using `useState` and `useEffect` hooks. It includes features for fetching and saving todos to local storage, toggling todo completion, and adding new todos. The application renders a list of todos with checkboxes and an input form.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/tutorial/10-links.md#_snippet_0
+
+LANGUAGE: jsx
+CODE:
+```
+import { render } from 'preact';
+import { useState, useEffect } from 'preact/hooks'
+
+const getTodos = async () => {
+  try {
+    return JSON.parse(localStorage.todos)
+  } catch (e) {
+    return [
+      { id: 1, text: 'learn Preact', done: true },
+      { id: 2, text: 'make an awesome app', done: false },
+    ]
+  }
+}
+
+function ToDos() {
+  const [todos, setTodos] = useState([])
+
+  useEffect(() => {
+    getTodos().then(todos => {
+      setTodos(todos)
+    })
+  }, [])
+
+  // every time todos changes...
+  useEffect(() => {
+    // ...save the list to localStorage:
+    localStorage.todos = JSON.stringify(todos)
+    // (try reloading the page to see saved todos!)
+  }, [todos])
+
+  function toggle(id) {
+    setTodos(todos => {
+      return todos.map(todo => {
+        // replace the matching todo item with a version where done is toggled
+        if (todo.id === id) {
+          todo = { ...todo, done: !todo.done }
+        }
+        return todo
+      })
+    })
+  }
+
+  function addTodo(e) {
+    e.preventDefault()
+    const form = e.target
+    const text = form.todo.value
+    // pass a callback to the `todos` state setter to update its value in-place:
+    setTodos(todos => {
+      const id = todos.length + 1
+      const newTodo = { id, text, done: false }
+      return todos.concat(newTodo)
+    })
+    form.reset()
+  }
+
+  return (
+    <div>
+      <ul style={{ listStyle: 'none', padding: 0 }}>
+        {todos.map(todo => (
+          <li key={todo.id}>
+            <label style={{ display: 'block' }}>
+              <input type="checkbox" checked={todo.done} onClick={() => toggle(todo.id)} />
+              {' ' + todo.text}
+            </label>
+          </li>
+        ))}
+      </ul>
+      <form onSubmit={addTodo}>
+        <input name="todo" placeholder="Add ToDo [enter]" />
+      </form>
+    </div>
+  )
+}
+
+render(<ToDos />, document.getElementById("app"));
+```
+
+----------------------------------------
+
+TITLE: Preact To-Do List Application with Signals
+DESCRIPTION: This comprehensive example demonstrates building a reactive To-Do list in Preact. It utilizes `@preact/signals` for managing the `todos` array, `newItem` input value, and `completedCount`. The code includes functions for adding and removing todos, and a `TodoList` component that renders the UI, handles user input, and updates the state reactively.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/src/components/controllers/repl/examples/todo-lists/todo-list-signals.txt#_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+import { render } from 'preact';
+import { signal, computed } from '@preact/signals';
+
+const todos = signal([
+	{ text: 'Write my first post', completed: true },
+	{ text: 'Buy new groceries', completed: false },
+	{ text: 'Walk the dog', completed: false }
+]);
+
+const completedCount = computed(
+	() => todos.value.filter(todo => todo.completed).length
+);
+
+const newItem = signal('');
+
+function addTodo(e) {
+	e.preventDefault();
+
+	todos.value = [...todos.value, { text: newItem.value, completed: false }];
+	newItem.value = ''; // Reset input value on add
+}
+
+function removeTodo(index) {
+	todos.value.splice(index, 1);
+	todos.value = [...todos.value];
+}
+
+function TodoList() {
+	const onInput = event => (newItem.value = event.target.value);
+
+	return (
+		<form onSubmit={addTodo}>
+			<input type="text" value={newItem.value} onInput={onInput} />
+			<button onClick={addTodo}>Add</button>
+			<ul>
+				{todos.value.map((todo, index) => (
+					<li>
+						<label>
+							<input
+								type="checkbox"
+								checked={todo.completed}
+								onInput={() => {
+									todo.completed = !todo.completed;
+									todos.value = [...todos.value];
+								}}
+							/>
+							{todo.completed ? <s>{todo.text}</s> : todo.text}
+						</label>{' '}
+						<button type="button" onClick={() => removeTodo(index)}>❌</button>
+					</li>
+				))}
+			</ul>
+			<p>Completed count: {completedCount.value}</p>
+		</form>
+	);
+}
+
+render(<TodoList />, document.getElementById('app'));
+```
+
+----------------------------------------
+
+TITLE: Final Preact JSX Code for Synchronized Counters with Context
+DESCRIPTION: This JSX code demonstrates a synchronized Preact counter application. It uses `createContext` and `useContext` to share the `count` state and `increment` function across multiple `Counter` components, ensuring they update in unison. `useMemo` is applied to optimize the context value, preventing unnecessary re-renders.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/tutorial/06-context.md#_snippet_8
+
+LANGUAGE: jsx
+CODE:
+```
+import { render, createContext } from 'preact';
+import { useState, useContext, useMemo } from 'preact/hooks';
+
+const CounterContext = createContext(null);
+
+function Counter() {
+  const { count, increment } = useContext(CounterContext);
+
+  return (
+    <div style={{ background: '#eee', padding: '10px' }}>
+      <p>Count: {count}</p>
+      <button onClick={increment}>Add</button>
+    </div>
+  );
+}
+
+function App() {
+  const [count, setCount] = useState(0);
+
+  function increment() {
+    setCount(count + 1);
+  }
+
+  const counter = useMemo(() => {
+    return { count, increment };
+  }, [count]);
+
+  return (
+    <CounterContext.Provider value={counter}>
+      <div style={{ display: 'flex', gap: '20px' }}>
+        <Counter />
+        <Counter />
+        <Counter />
+      </div>
+    </CounterContext.Provider>
+  )
+}
+
+render(<App />, document.getElementById("app"));
+```
+
+----------------------------------------
+
+TITLE: Creating and Updating Plain Signals in JavaScript
+DESCRIPTION: Plain signals are the fundamental root values for the reactive system, representing arbitrary JavaScript values wrapped in a reactive shell. This snippet demonstrates how to create a signal with an initial value, read its current value, and update it. Signals are a core primitive that can be combined with computed signals and effects for more complex reactive patterns.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/blog/signal-boosting.md#_snippet_0
+
+LANGUAGE: js
+CODE:
+```
+import { signal } from "@preact/signals-core";
+
+const s = signal(0);
+console.log(s.value); // Console: 0
+
+s.value = 1;
+console.log(s.value); // Console: 1
+```
+
+----------------------------------------
+
+TITLE: Nest Preact Components
+DESCRIPTION: Illustrates how components can reference and render other components within their Virtual DOM tree, creating a hierarchical structure of components.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/tutorial/03-components.md#_snippet_3
+
+LANGUAGE: jsx
+CODE:
+```
+function MediaPlayer() {
+  return (
+    <div>
+      <MyButton text="Play" />
+      <MyButton text="Stop" />
+    </div>
+  )
+}
+
+render(<MediaPlayer />, document.body)
+```
+
+----------------------------------------
+
+TITLE: Conditionally Render Nested Preact Components
+DESCRIPTION: Demonstrates how to use conditional logic (e.g., a ternary expression) within a component's render method to display different nested components based on prop values.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/tutorial/03-components.md#_snippet_4
+
+LANGUAGE: jsx
+CODE:
+```
+function MediaPlayer(props) {
+  return (
+    <div>
+      {props.playing ? (
+        <MyButton text="Stop" />
+      ) : (
+        <MyButton text="Play" />
+      )}
+    </div>
+  )
+}
+
+render(<MediaPlayer playing={false} />, document.body)
+// renders <button>Play</button>
+
+render(<MediaPlayer playing={true} />, document.body)
+// renders <button>Stop</button>
+```
+
+----------------------------------------
+
+TITLE: Implementing Reactive State with Preact Signals
+DESCRIPTION: This snippet showcases the core implementation of Preact Signals, demonstrating how `signal()` creates a reactive state variable. Accessing `count.value` within a component automatically subscribes it to updates, eliminating the need for selectors or wrapper functions and ensuring the component re-renders when the signal's value changes.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/blog/introducing-signals.md#_snippet_3
+
+LANGUAGE: jsx
+CODE:
+```
+import { render } from "preact";
+import { signal } from "@preact/signals";
+// Imagine this is some global state that the whole app needs access to:
+const count = signal(0);
+ 
+function Counter() {
+ return (
+   <button onClick={() => count.value++}>
+     Value: {count.value}
+   </button>
+ );
+}
+render(<Counter />, document.getElementById("app"));
+```
+
+----------------------------------------
+
+TITLE: Creating and Rendering Virtual DOM with JSX
+DESCRIPTION: This snippet shows how to achieve the same Virtual DOM creation and rendering using JSX syntax. It highlights JSX's HTML-like readability and mentions the need for a compiler like Babel to transform JSX into `createElement()` calls.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/tutorial/01-vdom.md#_snippet_2
+
+LANGUAGE: JSX
+CODE:
+```
+import { createElement, render } from 'preact';
+
+let vdom = <p class="big">Hello World!</p>;
+
+render(vdom, document.body);
+```
+
+----------------------------------------
+
+TITLE: Preact Signals: Virtual DOM vs. Direct DOM Updates
+DESCRIPTION: This example contrasts unoptimized and optimized rendering with Preact Signals. Passing `signal.value` to JSX triggers a component re-render, whereas passing the signal directly allows automatic in-place DOM updates without Virtual DOM diffing, significantly improving performance.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/guide/v10/signals.md#_snippet_25
+
+LANGUAGE: jsx
+CODE:
+```
+const count = signal(0);
+
+function Unoptimized() {
+  // Re-renders the component when `count` changes:
+  return <p>{count.value}</p>;
+}
+
+function Optimized() {
+  // Text automatically updates without re-rendering the component:
+  return <p>{count}</p>;
+}
+```
+
+----------------------------------------
+
+TITLE: Create a Basic Counter Component with Preact and useState
+DESCRIPTION: This snippet defines a functional Preact component named `Counter` that uses the `useState` hook to manage a numerical count. It includes buttons to increment and decrement the count, and an input field to display the current value. The component is then rendered into the DOM.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/src/components/controllers/repl/examples/counters/counter-htm.txt#_snippet_0
+
+LANGUAGE: JavaScript
+CODE:
+```
+import { render } from 'preact';
+import { useState } from 'preact/hooks';
+import { html } from 'htm/preact';
+
+function Counter() {
+	const [count, setCount] = useState(0);
+
+	return html`
+		<div class="counter-container">
+			<button onClick=${() => setCount(count + 1)}>Increment</button>
+			<input readonly value=${count} />
+			<button onClick=${() => setCount(count - 1)}>Decrement</button>
+		</div>
+	`;
+}
+
+render(html`<${Counter} />`, document.getElementById('app'));
+```
+
+----------------------------------------
+
+TITLE: Preact Function Component State with useState Hook
+DESCRIPTION: Illustrates state management in Preact function components using the `useState` hook. This hook returns a stateful value and a function to update it, causing the component to re-render when the state changes.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/tutorial/04-state.md#_snippet_1
+
+LANGUAGE: jsx
+CODE:
+```
+import { useState } from 'preact/hooks'
+
+const MyButton = () => {
+  const [clicked, setClicked] = useState(false)
+
+  const handleClick = () => {
+    setClicked(true)
+  }
+
+  return (
+    <button onClick={handleClick}>
+      {clicked ? 'Clicked' : 'No clicks yet'}
+    </button>
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Reacting to Signal Changes with useSignalEffect Hook
+DESCRIPTION: The `useSignalEffect` hook allows components to react to changes in signals. It takes a function that will be re-executed whenever any signal accessed within it changes, similar to `useEffect` but specifically for signals. This is useful for side effects like logging or DOM manipulation.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/guide/v10/signals.md#_snippet_31
+
+LANGUAGE: jsx
+CODE:
+```
+function MyComponent() {
+  const name = useSignal("Jane");
+
+  // Log to console when `name` changes:
+  useSignalEffect(() => console.log('Hello', name.value));
+}
+```
+
+----------------------------------------
+
+TITLE: Preact Context: Realistic Authentication State Management
+DESCRIPTION: This snippet presents a practical application of Preact Context for managing global authentication state. It demonstrates how to create a context (`AuthContext`) to hold user data and state update functions (`setUser`), using `useState` and `useMemo` for efficient state management. The `Login` component then consumes this context to display user status and toggle login/logout functionality.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/tutorial/06-context.md#_snippet_2
+
+LANGUAGE: jsx
+CODE:
+```
+import { createContext } from 'preact'
+import { useState, useMemo, useContext } from 'preact/hooks'
+
+const AuthContext = createContext()
+
+export default function App() {
+  const [user, setUser] = useState(null)
+
+  const auth = useMemo(() => {
+    return { user, setUser }
+  }, [user])
+
+  return (
+    <AuthContext.Provider value={auth}>
+      <div class="app">
+        {auth.user && <p>Welcome {auth.user.name}!</p>}
+        <Login />
+      </div>
+    </AuthContext.Provider>
+  )
+}
+
+function Login() {
+  const { user, setUser } = useContext(AuthContext)
+
+  if (user) return (
+    <div class="logged-in">
+      Logged in as {user.name}.
+      <button onClick={() => setUser(null)}>
+        Log Out
+      </button>
+    </div>
+  )
+
+  return (
+    <div class="logged-out">
+      <button onClick={() => setUser({ name: 'Bob' })}>
+        Log In
+      </button>
+    </div>
+  )
+}
+```
+
+----------------------------------------
+
+TITLE: Creating Preact Elements with JSX and h()
+DESCRIPTION: Demonstrates how to create Preact virtual DOM elements using both JSX syntax and the direct `h()` function call. This snippet illustrates that JSX is syntactic sugar for `h()`, showing their equivalence in defining components.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/guide/v10/tutorial.md#_snippet_0
+
+LANGUAGE: jsx
+CODE:
+```
+// With JSX
+const App = <h1>Hello World!</h1>;
+
+// ...the same without JSX
+const App = h('h1', null, 'Hello World');
+```
+
+----------------------------------------
+
+TITLE: Define a Basic Preact Component with JSX
+DESCRIPTION: This snippet demonstrates how to create a simple Preact component by encapsulating JSX within a function. The component is then rendered into a specified DOM element.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/tutorial/01-vdom.md#_snippet_6
+
+LANGUAGE: jsx
+CODE:
+```
+import { createElement } from 'preact';
+
+export default function App() {
+	return (
+		<p class="big">Hello World!</p>
+	)
+}
+
+render(<App />, document.getElementById("app"));
+```
+
+----------------------------------------
+
+TITLE: Implement Counter with Preact Hooks (useState, useCallback)
+DESCRIPTION: Shows an equivalent counter component implemented using Preact Hooks, specifically `useState` for state management and `useCallback` for memoizing the increment function.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/guide/v10/hooks.md#_snippet_1
+
+LANGUAGE: jsx
+CODE:
+```
+function Counter() {
+  const [value, setValue] = useState(0);
+  const increment = useCallback(() => {
+    setValue(value + 1);
+  }, [value]);
+
+  return (
+    <div>
+      <p>Counter: {value}</p>
+      <button onClick={increment}>Increment</button>
+    </div>
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Create Global Application State with Preact Signals
+DESCRIPTION: Defines a function to encapsulate global application state using Preact signals and computed properties. This approach facilitates easier testing by centralizing state management and separating data from modification functions.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/guide/v10/signals.md#_snippet_11
+
+LANGUAGE: jsx
+CODE:
+```
+function createAppState() {
+  const todos = signal([]);
+
+  const completed = computed(() => {
+    return todos.value.filter(todo => todo.completed).length
+  });
+
+  return { todos, completed }
+}
+```
+
+----------------------------------------
+
+TITLE: Define a custom Preact `useCounter` hook
+DESCRIPTION: This snippet defines a custom Preact hook, `useCounter`, which encapsulates basic counter functionality. It utilizes `useState` to manage the numerical count and `useCallback` to memoize the `increment` function, ensuring stable references and preventing unnecessary re-renders. The hook returns an object containing the current `count` and the `increment` function.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/guide/v10/preact-testing-library.md#_snippet_11
+
+LANGUAGE: jsx
+CODE:
+```
+import { useState, useCallback } from 'preact/hooks';
+
+const useCounter = () => {
+  const [count, setCount] = useState(0);
+  const increment = useCallback(() => setCount(c => c + 1), []);
+  return { count, increment };
+}
+```
+
+----------------------------------------
+
+TITLE: Preact Context API for Global State Management
+DESCRIPTION: This Preact application demonstrates the use of `createContext`, `useContext`, `useState`, and `useMemo` to create and consume a shared counter state. The `CounterContext` provides `count` and `increment` to multiple `Counter` components, allowing them to update and display the same global state.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/src/components/controllers/repl/examples/context.txt#_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+import { render, createContext } from 'preact';
+import { useState, useMemo, useContext } from 'preact/hooks';
+
+const CounterContext = createContext(null);
+
+function Counter() {
+	const { count, increment } = useContext(CounterContext);
+
+	return (
+		<div style={{ background: '#eee', padding: '10px' }}>
+			<p>Count: {count}</p>
+			<button onClick={increment}>Add</button>
+		</div>
+	);
+}
+
+function App() {
+	const [count, setCount] = useState(0);
+
+	function increment() {
+		setCount(count + 1);
+	}
+
+	const counter = useMemo(() => ({ count, increment }), [count]);
+
+	return (
+		<CounterContext.Provider value={counter}>
+			<div style={{ display: 'flex', gap: '20px' }}>
+				<Counter />
+				<Counter />
+				<Counter />
+			</div>
+		</CounterContext.Provider>
+	);
+}
+
+render(<App />, document.getElementById('app'));
+```
+
+----------------------------------------
+
+TITLE: Update Preact Context Dynamically with Hooks
+DESCRIPTION: Demonstrates how to create and update a Preact context dynamically using `createContext`, `useContext`, and `useState` hooks. It shows how a provider can pass down values and a setter function, allowing consumer components to modify the context value, enabling interactive UI updates.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/guide/v10/context.md#_snippet_3
+
+LANGUAGE: jsx
+CODE:
+```
+import { render, createContext } from "preact";
+import { useContext, useState } from "preact/hooks";
+
+const SomeComponent = props => props.children;
+const ThemePrimary = createContext(null);
+
+function ThemedButton() {
+  const { theme } = useContext(ThemePrimary);
+  return <button style={{ background: theme }}>Themed Button</button>;
+}
+
+function ThemePicker() {
+  const { theme, setTheme } = useContext(ThemePrimary);
+  return (
+    <input
+      type="color"
+      value={theme}
+      onChange={e => setTheme(e.currentTarget.value)}
+    />
+  );
+}
+
+function App() {
+  const [theme, setTheme] = useState("#673ab8");
+  return (
+    <ThemePrimary.Provider value={{ theme, setTheme }}>
+      <SomeComponent>
+        <ThemedButton />
+        {" - "}
+        <ThemePicker />
+      </SomeComponent>
+    </ThemePrimary.Provider>
+  );
+}
+render(<App />, document.getElementById("app"));
+```
+
+----------------------------------------
+
+TITLE: Optimized Signal Usage Directly in Preact JSX
+DESCRIPTION: Demonstrates Preact's deep integration with Signals, allowing signals to be used directly within JSX without explicitly accessing the `.value` property. This optimization simplifies component code and leverages Preact's internal mechanisms for efficient rendering.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/guide/v10/signals.md#_snippet_2
+
+LANGUAGE: jsx
+CODE:
+```
+import { render } from "preact";
+import { signal } from "@preact/signals";
+
+const count = signal(0);
+
+function Counter() {
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => count.value++}>click me</button>
+    </div>
+  );
+}
+render(<Counter />, document.getElementById("app"));
+```
+
+----------------------------------------
+
+TITLE: Implement a Basic TodoList Component in Preact
+DESCRIPTION: This snippet defines a `TodoList` Preact component. It manages a list of todo items in its state, providing methods to add new todos, mark them as complete/incomplete, and remove them. It also handles user input for new items and renders the list dynamically, including a count of completed items.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/src/components/controllers/repl/examples/todo-lists/todo-list.txt#_snippet_0
+
+LANGUAGE: javascript
+CODE:
+```
+import { render, Component } from 'preact';
+
+class TodoList extends Component {
+	state = {
+		todos: [
+			{ text: "Write my first post", completed: true },
+			{ text: "Buy new groceries", completed: false },
+			{ text: "Walk the dog", completed: false }
+		],
+		newItem: ''
+	};
+
+	setNewItem = e => {
+		this.setState({ newItem: e.target.value });
+	};
+
+	addTodo = e => {
+		e.preventDefault();
+
+		let { todos, newItem } = this.state;
+		todos = todos.concat({ text: newItem, completed: false });
+		this.setState({ todos, newItem: '' });  // Reset input value on add
+	};
+
+	completeTodo = (index) => {
+		let { todos } = this.state;
+		todos[index].completed = !todos[index].completed;
+		this.setState({ todos });
+	};
+
+	removeTodo = (index) => {
+		let { todos } = this.state;
+		todos.splice(index, 1);
+		this.setState({ todos });
+	};
+
+	completedCount = () => {
+		return this.state.todos.filter(todo => todo.completed).length;
+	};
+
+	render({}, { todos, newItem }) {
+		return (
+			<form onSubmit={this.addTodo}>
+				<input type="text" value={newItem} onInput={this.setNewItem} />
+				<button onClick={this.addTodo}>Add</button>
+				<ul>
+					{todos.map((todo, index) => (
+						<li>
+							<label>
+								<input
+									type="checkbox"
+									checked={todo.completed}
+									onInput={() => this.completeTodo(index)}
+								/>
+								{todo.completed ? <s>{todo.text}</s> : todo.text}
+							</label>
+							{' '}
+							<button type="button" onClick={() => this.removeTodo(index)}>❌</button>
+						</li>
+					))}
+				</ul>
+				<p>Completed count: {this.completedCount()}</p>
+			</form>
+		);
+	}
+}
+
+render(<TodoList />, document.getElementById('app'));
+```
+
+----------------------------------------
+
+TITLE: Preact Signals API: `effect(fn)`
+DESCRIPTION: Documents the `effect(fn)` function, used to run arbitrary side effects in response to signal changes. Similar to computed signals, effects track which signals are accessed and re-run their callback when those signals change. If the callback returns a function, this function will be run as a cleanup before the next value update.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/guide/v10/signals.md#_snippet_30
+
+LANGUAGE: APIDOC
+CODE:
+```
+effect(fn)
+  - Description: Runs arbitrary code in response to signal changes. Tracks accessed signals and re-runs the callback when they change.
+  - Parameters:
+    - fn: (function) A callback function to execute. Can return a cleanup function.
+  - Returns: void (does not return a signal).
+  - Example Usage:
+    const name = signal("Jane");
+    effect(() => console.log('Hello', name.value));
+    name.value = "John";
+```
+
+----------------------------------------
+
+TITLE: Build Preact Signals Todo List User Interface
+DESCRIPTION: Implements the React component for the todo list UI. It binds an input field to the `text` signal, a button to `addTodo`, and maps the `todos` signal to render list items with remove buttons.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/guide/v10/signals.md#_snippet_9
+
+LANGUAGE: jsx
+CODE:
+```
+function TodoList() {
+  const onInput = event => (text.value = event.currentTarget.value);
+
+  return (
+    <>
+      <input value={text.value} onInput={onInput} />
+      <button onClick={addTodo}>Add</button>
+      <ul>
+        {todos.value.map(todo => (
+          <li>
+            {todo.text}{' '}
+            <button onClick={() => removeTodo(todo)}>❌</button>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+```
+
+----------------------------------------
+
+TITLE: Rendering JSX with Preact
+DESCRIPTION: Demonstrates how to use Preact's `h()` and `render()` functions to transform JSX into Virtual DOM elements and then render them into the actual DOM. This example shows a simple `div` containing a `span` and an interactive `button`.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/guide/v8/getting-started.md#_snippet_5
+
+LANGUAGE: js
+CODE:
+```
+import { h, render } from 'preact';
+
+render((
+	<div id="foo">
+		<span>Hello, world!</span>
+		<button onClick={ e => alert("hi!") }>Click Me</button>
+	</div>
+), document.body);
+```
+
+----------------------------------------
+
+TITLE: Basic HTML setup with Import Maps for Preact and HTM
+DESCRIPTION: Demonstrates a complete HTML file structure using Import Maps to load Preact and HTM from a CDN, allowing for direct browser execution of a simple 'Hello, World!' Preact application without a build step. It highlights the use of bare specifiers and the `?external=preact` query parameter for dependency management.
+SOURCE: https://github.com/preactjs/preact-www/blob/master/content/en/guide/v10/no-build-workflows.md#_snippet_0
+
+LANGUAGE: html
+CODE:
+```
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="importmap">
+      {
+        "imports": {
+          "preact": "https://esm.sh/preact@10.23.1",
+          "htm/preact": "https://esm.sh/htm@3.1.1/preact?external=preact"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <script type="module">
+      import { render } from 'preact';
+      import { html } from 'htm/preact';
+
+      export function App() {
+        return html`<h1>Hello, World!</h1>`;
+      }
+
+      render(html`<${App} />`, document.getElementById('app'));
+    </script>
+  </body>
+</html>
+```
